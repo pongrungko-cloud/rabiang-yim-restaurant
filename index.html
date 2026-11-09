@@ -9,19 +9,10 @@
     <!-- Google Font: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Prompt', sans-serif;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #14532d;
-            border-radius: 4px;
-        }
+        body { font-family: 'Prompt', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #14532d; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-emerald-950 text-gray-100 min-h-full flex flex-col">
@@ -30,9 +21,7 @@
     <header class="bg-emerald-900 border-b border-emerald-800 sticky top-0 z-30 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-emerald-700 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-bold text-xl shadow">
-                    🌿
-                </div>
+                <div class="w-12 h-12 rounded-full bg-emerald-700 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-bold text-xl shadow">🌿</div>
                 <div>
                     <h1 class="text-2xl font-bold text-amber-300 tracking-wide">ร้านอาหารระเบียงยิ้ม</h1>
                     <p class="text-xs text-emerald-300">ระบบสั่งอาหารกลุ่ม ซิงค์ข้อมูล Real-time ทุกเครื่อง</p>
@@ -63,14 +52,12 @@
         
         <!-- Menu Section -->
         <section class="lg:col-span-2 flex flex-col gap-6">
-            
-            <!-- Custom Add Item Box -->
             <div class="bg-emerald-900/90 border border-amber-500/50 rounded-2xl p-4 shadow-xl">
                 <h3 class="text-sm font-bold text-amber-300 mb-2 flex items-center gap-1.5">
                     <span>✨</span> เพิ่มเมนูอื่นๆ / เครื่องดื่ม นอกเหนือจากรายการ
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                    <input type="text" id="customItemName" placeholder="ระบุชื่อเมนู หรือ เครื่องดื่ม (เช่น โค้ก, น้ำแข็ง, เบียร์)..." 
+                    <input type="text" id="customItemName" placeholder="ระบุชื่อเมนู หรือ เครื่องดื่ม (เช่น โค้ก, น้ำแข็ง)..." 
                         class="sm:col-span-7 bg-emerald-950 border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
                     <input type="number" id="customItemPrice" placeholder="ราคา (บาท)" 
                         class="sm:col-span-3 bg-emerald-950 border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
@@ -81,10 +68,8 @@
                 </div>
             </div>
 
-            <!-- Category Navigation Tabs -->
             <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoryTabs"></div>
 
-            <!-- Search & Instructions -->
             <div class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-emerald-900/60 p-4 rounded-xl border border-emerald-800 backdrop-blur-sm">
                 <div class="relative w-full sm:w-72">
                     <input type="text" id="searchInput" placeholder="ค้นหาชื่อเมนูอาหาร..." oninput="filterMenu()"
@@ -95,29 +80,21 @@
                 </div>
             </div>
 
-            <!-- Menu Grid Container -->
             <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
         </section>
 
         <!-- Sidebar: Cart & Order Summary -->
         <aside class="flex flex-col gap-6">
             <div class="bg-emerald-900/90 border border-emerald-700 rounded-2xl p-5 shadow-xl sticky top-24 flex flex-col h-[calc(100vh-7rem)]">
-                
                 <div class="flex items-center justify-between pb-4 border-b border-emerald-800">
-                    <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2">
-                        <span>📋</span> รายการอาหารที่เลือก
-                    </h2>
+                    <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2"><span>📋</span> รายการอาหารที่เลือก</h2>
                     <button onclick="clearCart()" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition">ล้างตะกร้าทั้งหมด</button>
                 </div>
 
-                <!-- Cart Items List -->
                 <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
-                    <div class="text-center text-emerald-400 py-10 text-sm">
-                        ยังไม่มีรายการอาหารในตะกร้า<br>เลือกเมนูทางด้านซ้ายเพื่อสั่งอาหาร
-                    </div>
+                    <div class="text-center text-emerald-400 py-10 text-sm">ยังไม่มีรายการอาหารในตะกร้า<br>เลือกเมนูทางด้านซ้ายเพื่อสั่งอาหาร</div>
                 </div>
 
-                <!-- Summary Calculations -->
                 <div class="pt-4 border-t border-emerald-800 space-y-2">
                     <div class="flex justify-between text-sm text-emerald-300">
                         <span>จำนวนอาหารทั้งหมด:</span>
@@ -133,17 +110,14 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="mt-4 space-y-2">
                     <button onclick="checkoutOrder()" 
                         class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
                         <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
                     </button>
                 </div>
-
             </div>
         </aside>
-
     </main>
 
     <!-- Notification Modal -->
@@ -158,12 +132,11 @@
         </div>
     </div>
 
-    <!-- Integrated Firebase & App Logic Script -->
+    <!-- Script & Firebase Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBZHCu6jg91LJwyuZcWKFSVawcNCap4M4",
             authDomain: "rabiang-yim-db.firebaseapp.com",
@@ -180,7 +153,6 @@
         const savingsRef = ref(db, 'restaurant/groupSavings');
         const cartRef = ref(db, 'restaurant/cart');
 
-        // Global Variables
         window.groupSavings = 5000;
         window.cart = [];
         let activeCategory = 'all';
@@ -203,10 +175,7 @@
 
         let menuItems = [
             {
-                id: 1,
-                name: 'เมนูแนะนำ',
-                category: 'recommend',
-                image: 'ระเบียงยิ้ม เมนูแนะนำ.jpg',
+                id: 1, name: 'เมนูแนะนำ', category: 'recommend', image: 'ระเบียงยิ้ม เมนูแนะนำ.jpg',
                 options: [
                     { label: 'แกงเหลืองปลากดคัง หน่อไม้ดอง (ถ้วย)', price: 199 },
                     { label: 'แกงเหลืองปลากดคัง หน่อไม้ดอง (หม้อไฟ)', price: 379 },
@@ -236,10 +205,7 @@
                 ]
             },
             {
-                id: 2,
-                name: 'เมนูกุ้งแม่น้ำ',
-                category: 'prawns',
-                image: 'ระเบียงยิ้ม เมนูกุ้งแม่น้ำ.jpg',
+                id: 2, name: 'เมนูกุ้งแม่น้ำ', category: 'prawns', image: 'ระเบียงยิ้ม เมนูกุ้งแม่น้ำ.jpg',
                 options: [
                     { label: 'กุ้งแม่น้ำเผา (ครึ่งโล / กิโลกรัม)', price: 390 },
                     { label: 'กุ้งแม่น้ำอบภูเขาไฟ', price: 350 },
@@ -257,10 +223,7 @@
                 ]
             },
             {
-                id: 3,
-                name: 'เมนูซิกเนเจอร์',
-                category: 'signature',
-                image: 'ระเบียงยิ้ม เมนูซิกเนเจอร์.jpg',
+                id: 3, name: 'เมนูซิกเนเจอร์', category: 'signature', image: 'ระเบียงยิ้ม เมนูซิกเนเจอร์.jpg',
                 options: [
                     { label: 'ปลากะพงทอดน้ำปลา', price: 359 },
                     { label: 'ต้มยำกุ้งน้ำข้น', price: 289 },
@@ -269,10 +232,7 @@
                 ]
             },
             {
-                id: 4,
-                name: 'เมนูต้ม',
-                category: 'soup',
-                image: 'ระเบียงยิ้ม เมนูต้ม.jpg',
+                id: 4, name: 'เมนูต้ม', category: 'soup', image: 'ระเบียงยิ้ม เมนูต้ม.jpg',
                 options: [
                     { label: 'ต้มยำ น้ำข้น / น้ำใส (ทะเล • ปลาหมึก • กุ้ง • ปลาตอลลี่ • ไข่ปลา) - ถ้วย', price: 170 },
                     { label: 'ต้มยำ น้ำข้น / น้ำใส (ทะเล • ปลาหมึก • กุ้ง • ปลาตอลลี่ • ไข่ปลา) - หม้อไฟ', price: 220 },
@@ -292,10 +252,7 @@
                 ]
             },
             {
-                id: 5,
-                name: 'เมนูทอด',
-                category: 'fried',
-                image: 'ระเบียงยิ้ม เมนูทอด.jpg',
+                id: 5, name: 'เมนูทอด', category: 'fried', image: 'ระเบียงยิ้ม เมนูทอด.jpg',
                 options: [
                     { label: 'หมูกรอบนายยิ้ม', price: 200 },
                     { label: 'หมูกรอบคั่วพริกเกลือ', price: 170 },
@@ -318,10 +275,7 @@
                 ]
             },
             {
-                id: 6,
-                name: 'เมนูทานเล่น',
-                category: 'appetizer',
-                image: 'ระเบียงยิ้ม เมนูทานเล่น.jpg',
+                id: 6, name: 'เมนูทานเล่น', category: 'appetizer', image: 'ระเบียงยิ้ม เมนูทานเล่น.jpg',
                 options: [
                     { label: 'แซลม่อนซาชิมิ', price: 190 },
                     { label: 'กุ้งแช่น้ำปลา', price: 150 },
@@ -346,10 +300,7 @@
                 ]
             },
             {
-                id: 7,
-                name: 'เมนูปลา',
-                category: 'fish',
-                image: 'ระเบียงยิ้ม เมนูปลา.jpg',
+                id: 7, name: 'เมนูปลา', category: 'fish', image: 'ระเบียงยิ้ม เมนูปลา.jpg',
                 options: [
                     { label: 'ปลาทับทิม (ทอดสมุนไพร • ทอดน้ำปลา • ทอดตะไคร้) - เล็ก', price: 169 },
                     { label: 'ปลาทับทิม (ทอดสมุนไพร • ทอดน้ำปลา • ทอดตะไคร้) - ใหญ่', price: 289 },
@@ -370,10 +321,7 @@
                 ]
             },
             {
-                id: 8,
-                name: 'เมนูปลาแดดเดียว',
-                category: 'driedFish',
-                image: 'ระเบียงยิ้ม เมนูปลาแดดเดียว.jpg',
+                id: 8, name: 'เมนูปลาแดดเดียว', category: 'driedFish', image: 'ระเบียงยิ้ม เมนูปลาแดดเดียว.jpg',
                 options: [
                     { label: 'ปลาช่อนแดดเดียวทอด + น้ำยำมะม่วง', price: 170 },
                     { label: 'ปลาสลิดแดดเดียวทอด + น้ำยำมะม่วง', price: 150 },
@@ -390,10 +338,7 @@
                 ]
             },
             {
-                id: 9,
-                name: 'เมนูปลาบึกยักษ์',
-                category: 'giantFish',
-                image: 'ระเบียงยิ้ม เมนูปลาบึกยัก.jpg',
+                id: 9, name: 'เมนูปลาบึกยักษ์', category: 'giantFish', image: 'ระเบียงยิ้ม เมนูปลาบึกยัก.jpg',
                 options: [
                     { label: 'ปลาบึกผัดฉ่า', price: 219 },
                     { label: 'ปลาบึกผัดพริกไทยดำ', price: 219 },
@@ -412,10 +357,7 @@
                 ]
             },
             {
-                id: 10,
-                name: 'เมนูผัด',
-                category: 'stirFried',
-                image: 'ระเบียงยิ้ม เมนูผัด.jpg',
+                id: 10, name: 'เมนูผัด', category: 'stirFried', image: 'ระเบียงยิ้ม เมนูผัด.jpg',
                 options: [
                     { label: 'ผัดฉ่า / ผัดขี้เมา / พริกไทยดำ (ทะเล • กุ้ง • หมึก • เนื้อ • หมูกรอบ • ปลาคัง • ปลาทับทิม • ปลาตอลลี่ • หมู) - ธรรมดา', price: 189 },
                     { label: 'ผัดฉ่า / ผัดขี้เมา / พริกไทยดำ (ทะเล • กุ้ง • หมึก • เนื้อ • หมูกรอบ • ปลาคัง • ปลาทับทิม • ปลาตอลลี่ • หมู) - กระทะร้อน', price: 239 },
@@ -439,10 +381,7 @@
                 ]
             },
             {
-                id: 11,
-                name: 'เมนูยำ',
-                category: 'yum',
-                image: 'ระเบียงยิ้ม เมนูยำ.jpg',
+                id: 11, name: 'เมนูยำ', category: 'yum', image: 'ระเบียงยิ้ม เมนูยำ.jpg',
                 options: [
                     { label: 'ยำ (ทะเล • หมูกรอบ • หมึก • กุ้ง)', price: 150 },
                     { label: 'ยำ (ไข่เค็ม • ไข่เยี่ยวม้า • กุนเชียง • แหนม)', price: 120 },
@@ -458,10 +397,7 @@
                 ]
             },
             {
-                id: 12,
-                name: 'อาหารจานเดียว',
-                category: 'singleDish',
-                image: 'ระเบียงยิ้ม อาหารจานเดียว.jpg',
+                id: 12, name: 'อาหารจานเดียว', category: 'singleDish', image: 'ระเบียงยิ้ม อาหารจานเดียว.jpg',
                 options: [
                     { label: 'ข้าวผัด (จานเล็ก / จานใหญ่) [หมู • ไก่ • แหนม]', price: 80 },
                     { label: 'ข้าวผัด (จานเล็ก / จานใหญ่) [หมูกรอบ • เนื้อ • ทะเล]', price: 90 },
@@ -502,7 +438,6 @@
             }
         ];
 
-        // UI Rendering Functions
         function renderCategoryTabs() {
             const container = document.getElementById('categoryTabs');
             if(!container) return;
@@ -520,9 +455,7 @@
             renderMenuGrid();
         }
 
-        window.filterMenu = function() {
-            renderMenuGrid();
-        }
+        window.filterMenu = function() { renderMenuGrid(); }
 
         function renderMenuGrid() {
             const grid = document.getElementById('menuGrid');
@@ -537,44 +470,31 @@
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-emerald-400 text-sm bg-emerald-900/40 rounded-xl border border-emerald-800">
-                        ไม่พบเมนูอาหารที่คุณค้นหา ลองเปลี่ยนคำค้นหาดูนะครับ
-                    </div>
-                `;
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-emerald-400 text-sm bg-emerald-900/40 rounded-xl border border-emerald-800">ไม่พบเมนูอาหารที่คุณค้นหา</div>`;
                 return;
             }
 
             grid.innerHTML = filtered.map(item => {
-                let optionsHtml = item.options.map((opt, idx) => `
-                    <option value="${idx}">${opt.label} — ${opt.price} บาท</option>
-                `).join('');
-
+                let optionsHtml = item.options.map((opt, idx) => `<option value="${idx}">${opt.label} — ${opt.price} บาท</option>`).join('');
                 return `
-                <div class="bg-emerald-900/80 border border-emerald-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover:border-amber-400/60 transition group">
+                <div class="bg-emerald-900/80 border border-emerald-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg">
                     <div>
                         <div class="relative rounded-xl overflow-hidden bg-emerald-950 border border-emerald-800 mb-3 flex items-center justify-center">
-                            <img src="${item.image}" alt="${item.name}" class="w-full h-auto object-contain group-hover:scale-105 transition duration-300">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-auto object-contain">
                         </div>
-
-                        <h3 class="font-bold text-base text-white group-hover:text-amber-300 transition line-clamp-1">${item.name}</h3>
-                        
+                        <h3 class="font-bold text-base text-white">${item.name}</h3>
                         <div class="mt-2">
-                            <label class="block text-xs text-emerald-300 mb-1">เลือกรายการย่อย / ขนาด / ประเภท:</label>
-                            <select id="select-opt-${item.id}" class="w-full bg-emerald-950 border border-emerald-700 rounded-lg px-3 py-2 text-xs text-amber-300 font-medium focus:outline-none focus:border-amber-400 transition">
+                            <label class="block text-xs text-emerald-300 mb-1">เลือกรายการย่อย / ขนาด:</label>
+                            <select id="select-opt-${item.id}" class="w-full bg-emerald-950 border border-emerald-700 rounded-lg px-3 py-2 text-xs text-amber-300 font-medium">
                                 ${optionsHtml}
                             </select>
                         </div>
                     </div>
-
                     <div class="flex items-center justify-between mt-4 pt-3 border-t border-emerald-800/80">
-                        <span class="text-xs text-emerald-400">หมวดหลัก: ${window.getCategoryName(item.category)}</span>
-                        <button onclick="addSelectedToCart(${item.id})" class="bg-emerald-700 hover:bg-amber-500 hover:text-emerald-950 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow">
-                            <span>+ เพิ่มลงตะกร้า</span>
-                        </button>
+                        <span class="text-xs text-emerald-400">หมวด: ${window.getCategoryName(item.category)}</span>
+                        <button onclick="addSelectedToCart(${item.id})" class="bg-emerald-700 hover:bg-amber-500 hover:text-emerald-950 text-white px-4 py-2 rounded-xl text-xs font-semibold transition"><span>+ เพิ่มลงตะกร้า</span></button>
                     </div>
-                </div>
-            `;
+                </div>`;
             }).join('');
         }
 
@@ -586,24 +506,15 @@
         window.addSelectedToCart = function(itemId) {
             const item = menuItems.find(i => i.id === itemId);
             if (!item) return;
-
             const selectEl = document.getElementById(`select-opt-${itemId}`);
             const selectedIdx = parseInt(selectEl.value);
             const selectedOpt = item.options[selectedIdx];
-
             const cartUniqueKey = `${itemId}-${selectedIdx}`;
             const existing = window.cart.find(c => c.key === cartUniqueKey);
 
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                window.cart.push({
-                    key: cartUniqueKey,
-                    name: `${item.name} (${selectedOpt.label})`,
-                    price: selectedOpt.price,
-                    image: item.image,
-                    qty: 1
-                });
+            if (existing) { existing.qty += 1; } 
+            else {
+                window.cart.push({ key: cartUniqueKey, name: `${item.name} (${selectedOpt.label})`, price: selectedOpt.price, image: item.image, qty: 1 });
             }
             window.saveCartToFirebase(window.cart);
         }
@@ -612,32 +523,14 @@
             const nameInput = document.getElementById('customItemName');
             const priceInput = document.getElementById('customItemPrice');
             if(!nameInput || !priceInput) return;
-
             const itemName = nameInput.value.trim();
             const itemPrice = parseFloat(priceInput.value);
 
-            if (!itemName) {
-                showModal('แจ้งเตือน', 'กรุณาระบุชื่อเมนูหรือเครื่องดื่มด้วยครับ', '⚠️');
-                return;
-            }
+            if (!itemName) { showModal('แจ้งเตือน', 'กรุณาระบุชื่อเมนูหรือเครื่องดื่ม', '⚠️'); return; }
+            if (isNaN(itemPrice) || itemPrice <= 0) { showModal('แจ้งเตือน', 'กรุณาระบุราคาที่ถูกต้อง', '⚠️'); return; }
 
-            if (isNaN(itemPrice) || itemPrice <= 0) {
-                showModal('แจ้งเตือน', 'กรุณาระบุราคาที่ถูกต้อง (มากกว่า 0 บาท)', '⚠️');
-                return;
-            }
-
-            const customKey = `custom-${Date.now()}`;
-            window.cart.push({
-                key: customKey,
-                name: `⭐ ${itemName} (เมนูพิเศษ)`,
-                price: itemPrice,
-                image: 'ระเบียงยิ้ม เมนูแนะนำ.jpg',
-                qty: 1
-            });
-
-            nameInput.value = '';
-            priceInput.value = '';
-
+            window.cart.push({ key: `custom-${Date.now()}`, name: `⭐ ${itemName} (เมนูพิเศษ)`, price: itemPrice, image: 'ระเบียงยิ้ม เมนูแนะนำ.jpg', qty: 1 });
+            nameInput.value = ''; priceInput.value = '';
             window.saveCartToFirebase(window.cart);
         }
 
@@ -645,9 +538,7 @@
             const index = window.cart.findIndex(c => c.key === key);
             if (index !== -1) {
                 window.cart[index].qty += delta;
-                if (window.cart[index].qty <= 0) {
-                    window.cart.splice(index, 1);
-                }
+                if (window.cart[index].qty <= 0) { window.cart.splice(index, 1); }
             }
             window.saveCartToFirebase(window.cart);
         }
@@ -670,7 +561,6 @@
             const remainingSavingsDisplay = document.getElementById('remainingSavingsDisplay');
 
             if(!cartList) return;
-
             const totalItems = window.cart.reduce((sum, item) => sum + item.qty, 0);
             const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             const remaining = window.groupSavings - totalPrice;
@@ -684,11 +574,7 @@
             }
 
             if (window.cart.length === 0) {
-                cartList.innerHTML = `
-                    <div class="text-center text-emerald-400 py-10 text-sm">
-                        ยังไม่มีรายการอาหารในตะกร้า<br>เลือกเมนูทางด้านซ้ายเพื่อสั่งอาหาร
-                    </div>
-                `;
+                cartList.innerHTML = `<div class="text-center text-emerald-400 py-10 text-sm">ยังไม่มีรายการอาหารในตะกร้า</div>`;
                 return;
             }
 
@@ -702,15 +588,12 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold text-xs flex items-center justify-center transition">-</button>
+                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs">-</button>
                         <span class="text-xs font-bold w-5 text-center">${item.qty}</span>
-                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold text-xs flex items-center justify-center transition">+</button>
-                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 hover:bg-red-700 text-red-300 hover:text-white rounded-lg text-xs flex items-center justify-center border border-red-800 transition" title="ลบรายการนี้">
-                            🗑️
-                        </button>
+                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs">+</button>
+                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 text-red-300 rounded-lg text-xs border border-red-800">🗑️</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         window.editSavings = function() {
@@ -731,26 +614,24 @@
 
         window.checkoutOrder = function() {
             if (window.cart.length === 0) {
-                showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนทำการสั่งซื้อครับ', '⚠️');
+                showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนสั่งซื้อ', '⚠️');
                 return;
             }
 
             const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            
             if (totalPrice > window.groupSavings) {
-                showModal('เงินกองกลางไม่พอ!', `ยอดเงินรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินออมกองกลางคงเหลือ (${window.groupSavings.toLocaleString()} บาท) กรุณาเติมเงินกองกลางหรือลดจำนวนเมนูอาหารลง`, '❌');
+                showModal('เงินกองกลางไม่พอ!', `ยอดรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินกองกลาง (${window.groupSavings.toLocaleString()} บาท)`, '❌');
                 return;
             }
 
             const newSavings = window.groupSavings - totalPrice;
             window.groupSavings = newSavings;
             
-            // บันทึกยอดเงินใหม่และเคลียร์ตะกร้าลง Firebase ทันทีแบบถาวร
+            // บันทึกยอดเงินคงเหลือใหม่และล้างตะกร้าลง Firebase ทันที
             window.saveSavingsToFirebase(newSavings);
             window.saveCartToFirebase([]);
             
-            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
-            
+            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อย\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
             window.cart = [];
             updateCartUI();
         }
@@ -762,11 +643,8 @@
             document.getElementById('customModal').classList.remove('hidden');
         }
 
-        window.closeModal = function() {
-            document.getElementById('customModal').classList.add('hidden');
-        }
+        window.closeModal = function() { document.getElementById('customModal').classList.add('hidden'); }
 
-        // Firebase Realtime Listeners
         onValue(savingsRef, (snapshot) => {
             const val = snapshot.val();
             if (val !== null) {
@@ -785,15 +663,9 @@
             updateCartUI();
         });
 
-        window.saveSavingsToFirebase = function(val) {
-            set(savingsRef, val);
-        }
+        window.saveSavingsToFirebase = function(val) { set(savingsRef, val); }
+        window.saveCartToFirebase = function(newCart) { set(cartRef, newCart); }
 
-        window.saveCartToFirebase = function(newCart) {
-            set(cartRef, newCart);
-        }
-
-        // Initial Render
         window.onload = function() {
             renderCategoryTabs();
             renderMenuGrid();
