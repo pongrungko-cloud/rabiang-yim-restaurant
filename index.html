@@ -158,11 +158,31 @@
         </div>
     </div>
 
-    <!-- Global Variables & Core App Logic -->
-    <script>
-        // ประกาศตัวแปร Global ไว้ให้ทุกฟังก์ชันใช้งานร่วมกันได้
-        let groupSavings = 5000;
-        let cart = [];
+    <!-- Integrated Firebase & App Logic Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZHCu6jg91LJwyuZcWKFSVawcNCap4M4",
+            authDomain: "rabiang-yim-db.firebaseapp.com",
+            databaseURL: "https://rabiang-yim-db-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rabiang-yim-db",
+            storageBucket: "rabiang-yim-db.appspot.com",
+            messagingSenderId: "854705996776",
+            appId: "1:854705996776:web:93090fac0f531275239a5d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const savingsRef = ref(db, 'restaurant/groupSavings');
+        const cartRef = ref(db, 'restaurant/cart');
+
+        // Global Variables
+        window.groupSavings = 5000;
+        window.cart = [];
         let activeCategory = 'all';
 
         const categories = [
@@ -482,11 +502,7 @@
             }
         ];
 
-        window.onload = function() {
-            renderCategoryTabs();
-            renderMenuGrid();
-        };
-
+        // UI Rendering Functions
         function renderCategoryTabs() {
             const container = document.getElementById('categoryTabs');
             if(!container) return;
@@ -552,7 +568,7 @@
                     </div>
 
                     <div class="flex items-center justify-between mt-4 pt-3 border-t border-emerald-800/80">
-                        <span class="text-xs text-emerald-400">หมวดหลัก: ${getCategoryName(item.category)}</span>
+                        <span class="text-xs text-emerald-400">หมวดหลัก: ${window.getCategoryName(item.category)}</span>
                         <button onclick="addSelectedToCart(${item.id})" class="bg-emerald-700 hover:bg-amber-500 hover:text-emerald-950 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow">
                             <span>+ เพิ่มลงตะกร้า</span>
                         </button>
@@ -576,12 +592,12 @@
             const selectedOpt = item.options[selectedIdx];
 
             const cartUniqueKey = `${itemId}-${selectedIdx}`;
-            const existing = cart.find(c => c.key === cartUniqueKey);
+            const existing = window.cart.find(c => c.key === cartUniqueKey);
 
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({
+                window.cart.push({
                     key: cartUniqueKey,
                     name: `${item.name} (${selectedOpt.label})`,
                     price: selectedOpt.price,
@@ -589,7 +605,7 @@
                     qty: 1
                 });
             }
-            if(window.saveCartToFirebase) window.saveCartToFirebase(cart);
+            window.saveCartToFirebase(window.cart);
         }
 
         window.addCustomItemToCart = function() {
@@ -611,7 +627,7 @@
             }
 
             const customKey = `custom-${Date.now()}`;
-            cart.push({
+            window.cart.push({
                 key: customKey,
                 name: `⭐ ${itemName} (เมนูพิเศษ)`,
                 price: itemPrice,
@@ -622,28 +638,28 @@
             nameInput.value = '';
             priceInput.value = '';
 
-            if(window.saveCartToFirebase) window.saveCartToFirebase(cart);
+            window.saveCartToFirebase(window.cart);
         }
 
         window.changeQty = function(key, delta) {
-            const index = cart.findIndex(c => c.key === key);
+            const index = window.cart.findIndex(c => c.key === key);
             if (index !== -1) {
-                cart[index].qty += delta;
-                if (cart[index].qty <= 0) {
-                    cart.splice(index, 1);
+                window.cart[index].qty += delta;
+                if (window.cart[index].qty <= 0) {
+                    window.cart.splice(index, 1);
                 }
             }
-            if(window.saveCartToFirebase) window.saveCartToFirebase(cart);
+            window.saveCartToFirebase(window.cart);
         }
 
         window.removeItem = function(key) {
-            cart = cart.filter(c => c.key !== key);
-            if(window.saveCartToFirebase) window.saveCartToFirebase(cart);
+            window.cart = window.cart.filter(c => c.key !== key);
+            window.saveCartToFirebase(window.cart);
         }
 
         window.clearCart = function() {
-            cart = [];
-            if(window.saveCartToFirebase) window.saveCartToFirebase(cart);
+            window.cart = [];
+            window.saveCartToFirebase(window.cart);
         }
 
         window.updateCartUI = function() {
@@ -655,9 +671,9 @@
 
             if(!cartList) return;
 
-            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const remaining = groupSavings - totalPrice;
+            const totalItems = window.cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const remaining = window.groupSavings - totalPrice;
 
             if(cartCountHeader) cartCountHeader.innerText = totalItems;
             if(totalItemsCount) totalItemsCount.innerText = `${totalItems} รายการ`;
@@ -667,7 +683,7 @@
                 remainingSavingsDisplay.className = remaining < 0 ? "font-semibold text-red-400" : "font-semibold text-white";
             }
 
-            if (cart.length === 0) {
+            if (window.cart.length === 0) {
                 cartList.innerHTML = `
                     <div class="text-center text-emerald-400 py-10 text-sm">
                         ยังไม่มีรายการอาหารในตะกร้า<br>เลือกเมนูทางด้านซ้ายเพื่อสั่งอาหาร
@@ -676,7 +692,7 @@
                 return;
             }
 
-            cartList.innerHTML = cart.map(item => `
+            cartList.innerHTML = window.cart.map(item => `
                 <div class="bg-emerald-950/60 border border-emerald-800 rounded-xl p-3 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5 overflow-hidden">
                         <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-lg object-cover border border-emerald-700 flex-shrink-0">
@@ -698,11 +714,11 @@
         }
 
         window.editSavings = function() {
-            const newAmount = prompt('กรอกจำนวนเงินออมกองกลางกลุ่มใหม่ (บาท):', groupSavings);
+            const newAmount = prompt('กรอกจำนวนเงินออมกองกลางกลุ่มใหม่ (บาท):', window.groupSavings);
             if (newAmount !== null && !isNaN(newAmount) && newAmount.trim() !== '') {
                 const parsed = parseFloat(newAmount);
-                groupSavings = parsed;
-                if(window.saveSavingsToFirebase) window.saveSavingsToFirebase(parsed);
+                window.groupSavings = parsed;
+                window.saveSavingsToFirebase(parsed);
                 updateSavingsDisplay();
                 updateCartUI();
             }
@@ -710,30 +726,30 @@
 
         window.updateSavingsDisplay = function() {
             const el = document.getElementById('savingsDisplay');
-            if(el) el.innerText = groupSavings.toLocaleString();
+            if(el) el.innerText = window.groupSavings.toLocaleString();
         }
 
         window.checkoutOrder = function() {
-            if (cart.length === 0) {
+            if (window.cart.length === 0) {
                 showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนทำการสั่งซื้อครับ', '⚠️');
                 return;
             }
 
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             
-            if (totalPrice > groupSavings) {
-                showModal('เงินกองกลางไม่พอ!', `ยอดเงินรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินออมกองกลางคงเหลือ (${groupSavings.toLocaleString()} บาท) กรุณาเติมเงินกองกลางหรือลดจำนวนเมนูอาหารลง`, '❌');
+            if (totalPrice > window.groupSavings) {
+                showModal('เงินกองกลางไม่พอ!', `ยอดเงินรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินออมกองกลางคงเหลือ (${window.groupSavings.toLocaleString()} บาท) กรุณาเติมเงินกองกลางหรือลดจำนวนเมนูอาหารลง`, '❌');
                 return;
             }
 
-            const newSavings = groupSavings - totalPrice;
-            groupSavings = newSavings;
-            if(window.saveSavingsToFirebase) window.saveSavingsToFirebase(newSavings);
+            const newSavings = window.groupSavings - totalPrice;
+            window.groupSavings = newSavings;
+            window.saveSavingsToFirebase(newSavings);
             
             showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
             
-            cart = [];
-            if(window.saveCartToFirebase) window.saveCartToFirebase(cart);
+            window.cart = [];
+            window.saveCartToFirebase(window.cart);
         }
 
         function showModal(title, message, icon = '🎉') {
@@ -746,36 +762,15 @@
         window.closeModal = function() {
             document.getElementById('customModal').classList.add('hidden');
         }
-    </script>
 
-    <!-- Firebase SDK Integration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZHCu6jg91LJwyuZcWKFSVawcNCap4M4",
-            authDomain: "rabiang-yim-db.firebaseapp.com",
-            databaseURL: "https://rabiang-yim-db-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "rabiang-yim-db",
-            storageBucket: "rabiang-yim-db.appspot.com",
-            messagingSenderId: "854705996776",
-            appId: "1:854705996776:web:93090fac0f531275239a5d"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        const savingsRef = ref(db, 'restaurant/groupSavings');
-        const cartRef = ref(db, 'restaurant/cart');
-
+        // Firebase Realtime Listeners
         onValue(savingsRef, (snapshot) => {
             const val = snapshot.val();
             if (val !== null) {
-                groupSavings = val;
+                window.groupSavings = val;
             } else {
                 set(savingsRef, 5000);
-                groupSavings = 5000;
+                window.groupSavings = 5000;
             }
             updateSavingsDisplay();
             updateCartUI();
@@ -783,7 +778,7 @@
 
         onValue(cartRef, (snapshot) => {
             const val = snapshot.val();
-            cart = val ? val : [];
+            window.cart = val ? val : [];
             updateCartUI();
         });
 
@@ -794,6 +789,12 @@
         window.saveCartToFirebase = function(newCart) {
             set(cartRef, newCart);
         }
+
+        // Initial Render
+        window.onload = function() {
+            renderCategoryTabs();
+            renderMenuGrid();
+        };
     </script>
 </body>
 </html>
