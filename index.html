@@ -612,27 +612,28 @@
             if(el) el.innerText = window.groupSavings.toLocaleString();
         }
 
-        window.checkoutOrder = function() {
+       window.checkoutOrder = function() {
             if (window.cart.length === 0) {
-                showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนสั่งซื้อ', '⚠️');
+                showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนทำการสั่งซื้อครับ', '⚠️');
                 return;
             }
 
             const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            
             if (totalPrice > window.groupSavings) {
-                showModal('เงินกองกลางไม่พอ!', `ยอดรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินกองกลาง (${window.groupSavings.toLocaleString()} บาท)`, '❌');
+                showModal('เงินกองกลางไม่พอ!', `ยอดเงินรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินออมกองกลางคงเหลือ (${window.groupSavings.toLocaleString()} บาท) กรุณาเติมเงินกองกลางหรือลดจำนวนเมนูอาหารลง`, '❌');
                 return;
             }
 
             const newSavings = window.groupSavings - totalPrice;
             window.groupSavings = newSavings;
             
-            // บันทึกยอดเงินคงเหลือใหม่และล้างตะกร้าลง Firebase ทันที
+            // บันทึกเฉพาะยอดเงินกองกลางที่หักแล้ว แต่ "คงรายการในตะกร้าไว้ให้แก้ไขได้"
             window.saveSavingsToFirebase(newSavings);
-            window.saveCartToFirebase([]);
             
-            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อย\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
-            window.cart = [];
+            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
+            
+            // หมายเหตุ: เอาคำสั่งล้างตะกร้าออก เพื่อให้ผู้ใช้ยังสามารถกดดูหรือแก้ไขรายการย้อนหลังได้
             updateCartUI();
         }
 
