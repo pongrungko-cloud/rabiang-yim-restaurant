@@ -57,7 +57,7 @@
                     <span>✨</span> เพิ่มเมนูอื่นๆ / เครื่องดื่ม นอกเหนือจากรายการ
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                    <input type="text" id="customItemName" placeholder="ระบุชื่อเมนู หรือ เครื่องดื่ม (เช่น โค้ก, น้ำแข็ง)..." 
+                    <input type="text" id="customItemName" placeholder="ระบุชื่อเมนู หรือ เครื่องดื่ม..." 
                         class="sm:col-span-7 bg-emerald-950 border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
                     <input type="number" id="customItemPrice" placeholder="ราคา (บาท)" 
                         class="sm:col-span-3 bg-emerald-950 border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
@@ -76,7 +76,7 @@
                         class="w-full bg-emerald-950 border border-emerald-700 rounded-lg px-4 py-2 text-sm text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
                 </div>
                 <div class="text-xs text-emerald-300 text-center sm:text-right">
-                    💡 <span class="underline">วิธีใช้งาน:</span> เลือกรายการย่อยจาก Dropdown และกดปุ่มเพิ่มลงตะกร้าได้ทันที
+                    💡 <span class="underline">วิธีใช้งาน:</span> เลือกรายการย่อยและกดเพิ่มลงตะกร้า
                 </div>
             </div>
 
@@ -87,8 +87,13 @@
         <aside class="flex flex-col gap-6">
             <div class="bg-emerald-900/90 border border-emerald-700 rounded-2xl p-5 shadow-xl sticky top-24 flex flex-col h-[calc(100vh-7rem)]">
                 <div class="flex items-center justify-between pb-4 border-b border-emerald-800">
-                    <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2"><span>📋</span> รายการอาหารที่เลือก</h2>
-                    <button onclick="clearCart()" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition">ล้างตะกร้าทั้งหมด</button>
+                    <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2"><span>📋</span> รายการอาหารในตะกร้า</h2>
+                    <button onclick="clearCart()" id="clearCartBtn" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition">ล้างตะกร้า</button>
+                </div>
+
+                <!-- Status Banner -->
+                <div id="orderStatusBanner" class="hidden my-2 p-2.5 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 text-xs text-center font-semibold">
+                    🔒 ออเดอร์นี้ถูกยืนยันและตัดเงินกองกลางแล้ว
                 </div>
 
                 <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
@@ -105,14 +110,15 @@
                         <span id="totalPriceDisplay" class="text-lg">0 บาท</span>
                     </div>
                     <div class="flex justify-between text-xs text-emerald-400 pt-1 border-t border-emerald-800/60">
-                        <span>เงินออมคงเหลือหลังหัก:</span>
+                        <span>เงินออมคงเหลือในกองกลาง:</span>
                         <span id="remainingSavingsDisplay" class="font-semibold text-white">5,000 บาท</span>
                     </div>
                 </div>
 
-                <div class="mt-4 space-y-2">
-                    <button onclick="checkoutOrder()" 
-                        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
+                <!-- Action Buttons -->
+                <div class="mt-4 space-y-2" id="actionButtonArea">
+                    <button onclick="checkoutOrder()" id="checkoutBtn"
+                        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                         <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
                     </button>
                 </div>
@@ -152,9 +158,11 @@
 
         const savingsRef = ref(db, 'restaurant/groupSavings');
         const cartRef = ref(db, 'restaurant/cart');
+        const orderStatusRef = ref(db, 'restaurant/orderConfirmed');
 
         window.groupSavings = 5000;
         window.cart = [];
+        window.isOrderConfirmed = false;
         let activeCategory = 'all';
 
         const categories = [
@@ -504,6 +512,10 @@
         }
 
         window.addSelectedToCart = function(itemId) {
+            if (window.isOrderConfirmed) {
+                showModal('แจ้งเตือน', 'ออเดอร์นี้ถูกยืนยันแล้ว หากต้องการแก้ไขกรุณากดปุ่ม "ปลดล็อกแก้ไขออเดอร์" ก่อนครับ', '⚠️');
+                return;
+            }
             const item = menuItems.find(i => i.id === itemId);
             if (!item) return;
             const selectEl = document.getElementById(`select-opt-${itemId}`);
@@ -519,63 +531,30 @@
             window.saveCartToFirebase(window.cart);
         }
 
-        // ฟังก์ชันปรับจำนวนสินค้า พร้อมคืนเงินหรือหักเงินกองกลางตามจริง
-        window.changeQty = function(key, delta) {
-            const index = window.cart.findIndex(c => c.key === key);
-            if (index !== -1) {
-                const item = window.cart[index];
-                
-                // ถ้าเป็นการลดจำนวนสินค้า (delta < 0) ให้คืนเงินเข้ากองกลาง
-                if (delta < 0 && item.qty > 0) {
-                    window.groupSavings += item.price;
-                    window.saveSavingsToFirebase(window.groupSavings);
-                } 
-                // ถ้าเป็นการเพิ่มจำนวนสินค้า (delta > 0) ให้เช็คว่าเงินพอไหมแล้วหักเพิ่ม
-                else if (delta > 0) {
-                    if (window.groupSavings < item.price) {
-                        showModal('เงินกองกลางไม่พอ!', 'ยอดเงินกองกลางไม่เพียงพอสำหรับเพิ่มจำนวนอาหารรายการนี้', '❌');
-                        return;
-                    }
-                    window.groupSavings -= item.price;
-                    window.saveSavingsToFirebase(window.groupSavings);
-                }
-
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    window.cart.splice(index, 1);
-                }
+        window.addCustomItemToCart = function() {
+            if (window.isOrderConfirmed) {
+                showModal('แจ้งเตือน', 'ออเดอร์นี้ถูกยืนยันแล้ว หากต้องการแก้ไขกรุณากดปลดล็อกก่อนครับ', '⚠️');
+                return;
             }
-            window.saveCartToFirebase(window.cart);
-        }
+            const nameInput = document.getElementById('customItemName');
+            const priceInput = document.getElementById('customItemPrice');
+            if(!nameInput || !priceInput) return;
+            const itemName = nameInput.value.trim();
+            const itemPrice = parseFloat(priceInput.value);
 
-        // ฟังก์ชันลบรายการออกจากตะกร้า พร้อมคืนเงินทั้งหมดของรายการนั้นเข้ากองกลาง
-        window.removeItem = function(key) {
-            const index = window.cart.findIndex(c => c.key === key);
-            if (index !== -1) {
-                const item = window.cart[index];
-                const refundAmount = item.price * item.qty;
-                
-                // คืนเงินเข้ากองกลางตามราคารวมของรายการที่ลบ
-                window.groupSavings += refundAmount;
-                window.saveSavingsToFirebase(window.groupSavings);
+            if (!itemName) { showModal('แจ้งเตือน', 'กรุณาระบุชื่อเมนู', '⚠️'); return; }
+            if (isNaN(itemPrice) || itemPrice <= 0) { showModal('แจ้งเตือน', 'กรุณาระบุราคาที่ถูกต้อง', '⚠️'); return; }
 
-                window.cart.splice(index, 1);
-            }
-            window.saveCartToFirebase(window.cart);
-        }
-
-        // ฟังก์ชันล้างตะกร้าทั้งหมด พร้อมคืนเงินทั้งหมดที่เคยหักกลับเข้ากองกลาง
-        window.clearCart = function() {
-            const totalRefund = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            if (totalRefund > 0) {
-                window.groupSavings += totalRefund;
-                window.saveSavingsToFirebase(window.groupSavings);
-            }
-            window.cart = [];
+            window.cart.push({ key: `custom-${Date.now()}`, name: `⭐ ${itemName} (เมนูพิเศษ)`, price: itemPrice, image: 'ระเบียงยิ้ม เมนูแนะนำ.jpg', qty: 1 });
+            nameInput.value = ''; priceInput.value = '';
             window.saveCartToFirebase(window.cart);
         }
 
         window.changeQty = function(key, delta) {
+            if (window.isOrderConfirmed) {
+                showModal('แจ้งเตือน', 'ออเดอร์นี้ถูกยืนยันแล้ว หากต้องการแก้ไขกรุณากดปลดล็อกก่อนครับ', '⚠️');
+                return;
+            }
             const index = window.cart.findIndex(c => c.key === key);
             if (index !== -1) {
                 window.cart[index].qty += delta;
@@ -585,11 +564,19 @@
         }
 
         window.removeItem = function(key) {
+            if (window.isOrderConfirmed) {
+                showModal('แจ้งเตือน', 'ออเดอร์นี้ถูกยืนยันแล้ว หากต้องการแก้ไขกรุณากดปลดล็อกก่อนครับ', '⚠️');
+                return;
+            }
             window.cart = window.cart.filter(c => c.key !== key);
             window.saveCartToFirebase(window.cart);
         }
 
         window.clearCart = function() {
+            if (window.isOrderConfirmed) {
+                showModal('แจ้งเตือน', 'ออเดอร์นี้ถูกยืนยันแล้ว หากต้องการแก้ไขกรุณากดปลดล็อกก่อนครับ', '⚠️');
+                return;
+            }
             window.cart = [];
             window.saveCartToFirebase(window.cart);
         }
@@ -600,18 +587,37 @@
             const totalItemsCount = document.getElementById('totalItemsCount');
             const totalPriceDisplay = document.getElementById('totalPriceDisplay');
             const remainingSavingsDisplay = document.getElementById('remainingSavingsDisplay');
+            const orderStatusBanner = document.getElementById('orderStatusBanner');
+            const actionButtonArea = document.getElementById('actionButtonArea');
+            const clearCartBtn = document.getElementById('clearCartBtn');
 
             if(!cartList) return;
             const totalItems = window.cart.reduce((sum, item) => sum + item.qty, 0);
             const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const remaining = window.groupSavings - totalPrice;
+            const remaining = window.groupSavings;
 
             if(cartCountHeader) cartCountHeader.innerText = totalItems;
             if(totalItemsCount) totalItemsCount.innerText = `${totalItems} รายการ`;
             if(totalPriceDisplay) totalPriceDisplay.innerText = `${totalPrice.toLocaleString()} บาท`;
-            if(remainingSavingsDisplay) {
-                remainingSavingsDisplay.innerText = `${remaining.toLocaleString()} บาท`;
-                remainingSavingsDisplay.className = remaining < 0 ? "font-semibold text-red-400" : "font-semibold text-white";
+            if(remainingSavingsDisplay) remainingSavingsDisplay.innerText = `${remaining.toLocaleString()} บาท`;
+
+            // จัดการ UI ตามสถานะการยืนยันออเดอร์
+            if (window.isOrderConfirmed) {
+                orderStatusBanner.classList.remove('hidden');
+                clearCartBtn.classList.add('hidden');
+                actionButtonArea.innerHTML = `
+                    <button onclick="unlockOrder()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <span>🔓 ปลดล็อก / แก้ไขออเดอร์ (คืนเงิน)</span>
+                    </button>
+                `;
+            } else {
+                orderStatusBanner.classList.add('hidden');
+                clearCartBtn.classList.remove('hidden');
+                actionButtonArea.innerHTML = `
+                    <button onclick="checkoutOrder()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
+                    </button>
+                `;
             }
 
             if (window.cart.length === 0) {
@@ -629,10 +635,10 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs">-</button>
+                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs" ${window.isOrderConfirmed ? 'disabled' : ''}>-</button>
                         <span class="text-xs font-bold w-5 text-center">${item.qty}</span>
-                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs">+</button>
-                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 text-red-300 rounded-lg text-xs border border-red-800">🗑️</button>
+                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs" ${window.isOrderConfirmed ? 'disabled' : ''}>+</button>
+                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 text-red-300 rounded-lg text-xs border border-red-800" ${window.isOrderConfirmed ? 'disabled' : ''}>🗑️</button>
                     </div>
                 </div>`).join('');
         }
@@ -653,29 +659,40 @@
             if(el) el.innerText = window.groupSavings.toLocaleString();
         }
 
-       window.checkoutOrder = function() {
+        window.checkoutOrder = function() {
             if (window.cart.length === 0) {
-                showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนทำการสั่งซื้อครับ', '⚠️');
+                showModal('แจ้งเตือน', 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการก่อนยืนยัน', '⚠️');
                 return;
             }
 
             const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            
             if (totalPrice > window.groupSavings) {
-                showModal('เงินกองกลางไม่พอ!', `ยอดเงินรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินออมกองกลางคงเหลือ (${window.groupSavings.toLocaleString()} บาท) กรุณาเติมเงินกองกลางหรือลดจำนวนเมนูอาหารลง`, '❌');
+                showModal('เงินกองกลางไม่พอ!', `ยอดรวม ${totalPrice.toLocaleString()} บาท เกินกว่าเงินกองกลาง (${window.groupSavings.toLocaleString()} บาท)`, '❌');
                 return;
             }
 
             const newSavings = window.groupSavings - totalPrice;
             window.groupSavings = newSavings;
-            
-            // บันทึกเฉพาะยอดเงินกองกลางที่หักแล้ว แต่ "คงรายการในตะกร้าไว้ให้แก้ไขได้"
+            window.isOrderConfirmed = true;
+
             window.saveSavingsToFirebase(newSavings);
-            
-            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
-            
-            // หมายเหตุ: เอาคำสั่งล้างตะกร้าออก เพื่อให้ผู้ใช้ยังสามารถกดดูหรือแก้ไขรายการย้อนหลังได้
+            set(orderStatusRef, true);
+
+            showModal('ยืนยันออเดอร์สำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อย\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินกองกลางคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
             updateCartUI();
+        }
+
+        window.unlockOrder = function() {
+            const confirmUnlock = confirm('ต้องการปลดล็อกเพื่อแก้ไขออเดอร์ใช่ไหมครับ? (ระบบจะคืนเงินกองกลางให้ตามยอดออเดอร์เดิม)');
+            if (confirmUnlock) {
+                const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                window.groupSavings += totalPrice;
+                window.isOrderConfirmed = false;
+
+                window.saveSavingsToFirebase(window.groupSavings);
+                set(orderStatusRef, false);
+                updateCartUI();
+            }
         }
 
         function showModal(title, message, icon = '🎉') {
@@ -689,12 +706,8 @@
 
         onValue(savingsRef, (snapshot) => {
             const val = snapshot.val();
-            if (val !== null) {
-                window.groupSavings = val;
-            } else {
-                set(savingsRef, 5000);
-                window.groupSavings = 5000;
-            }
+            if (val !== null) { window.groupSavings = val; } 
+            else { set(savingsRef, 5000); window.groupSavings = 5000; }
             updateSavingsDisplay();
             updateCartUI();
         });
@@ -702,6 +715,12 @@
         onValue(cartRef, (snapshot) => {
             const val = snapshot.val();
             window.cart = val ? val : [];
+            updateCartUI();
+        });
+
+        onValue(orderStatusRef, (snapshot) => {
+            const val = snapshot.val();
+            window.isOrderConfirmed = val ? val : false;
             updateCartUI();
         });
 
