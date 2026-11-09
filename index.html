@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <!-- Menu Grid Container (12 เมนูหลักพร้อมรูปประกอบจากป้ายเมนูจริง) -->
+            <!-- Menu Grid Container -->
             <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Menu Cards Injected via JS -->
             </div>
@@ -94,7 +94,7 @@
                     <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2">
                         <span>📋</span> รายการอาหารที่เลือก
                     </h2>
-                    <button onclick="clearCart()" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition">ล้างตะกร้า</button>
+                    <button onclick="clearCart()" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition">ล้างตะกร้าทั้งหมด</button>
                 </div>
 
                 <!-- Cart Items List -->
@@ -120,11 +120,19 @@
                     </div>
                 </div>
 
-                <!-- Action Button -->
-                <button onclick="checkoutOrder()" 
-                    class="mt-4 w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
-                    <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
-                </button>
+                <!-- Action Buttons -->
+                <div class="mt-4 space-y-2">
+                    <button onclick="checkoutOrder()" 
+                        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-2">
+                        <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
+                    </button>
+                    
+                    <!-- Undo / Revert Button -->
+                    <button id="undoBtn" onclick="undoLastOrder()" 
+                        class="w-full bg-emerald-800 hover:bg-red-900/80 text-amber-300 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl border border-emerald-700 transition hidden flex items-center justify-center gap-1">
+                        <span>↩️ ยกเลิกคำสั่งซื้อล่าสุด (คืนเงิน/ดึงตะกร้ากลับ)</span>
+                    </button>
+                </div>
 
             </div>
         </aside>
@@ -145,7 +153,9 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        let groupSavings = 5000;
+        let groupSavings = localStorage.getItem('rabiang_yim_savings') !== null 
+            ? parseFloat(localStorage.getItem('rabiang_yim_savings')) 
+            : 5000;
 
         const categories = [
             { id: 'all', name: 'ทั้งหมด' },
@@ -161,7 +171,6 @@
 
         let activeCategory = 'all';
 
-        // 12 เมนูหลัก พร้อมรูปภาพตรงตามป้ายเมนูจริงที่แนบมา
         let menuItems = [
             {
                 id: 1,
@@ -317,7 +326,7 @@
                 image: 'ระเบียงยิ้ม เมนูปลาแดดเดียว.jpg',
                 options: [
                     { label: 'ปลาช่อนแดดเดียวทอด + ยำมะม่วง', price: 170 },
-                    { label: 'ปลาสลิดแดดเดียวทอด + ยำมะม่วง', price: 150 },
+                    { label: 'ปลาสลิด / ปลาดุกแดดเดียวทอด + ยำมะม่วง', price: 150 },
                     { label: 'ปลาดุกแดดเดียวทอด + ยำมะม่วง', price: 140 },
                     { label: 'ปลาหลอดแดดเดียวทอดกระเทียม', price: 140 },
                     { label: 'ต้มโคล้งปลาช่อน / ปลาสลิดแดดเดียว', price: 190 }
@@ -340,12 +349,15 @@
             }
         ];
 
-        let cart = [];
+        let cart = localStorage.getItem('rabiang_yim_cart') ? JSON.parse(localStorage.getItem('rabiang_yim_cart')) : [];
+        let lastOrder = localStorage.getItem('rabiang_yim_lastOrder') ? JSON.parse(localStorage.getItem('rabiang_yim_lastOrder')) : null;
 
         window.onload = function() {
             renderCategoryTabs();
             renderMenuGrid();
             updateSavingsDisplay();
+            updateCartUI();
+            checkUndoButton();
         };
 
         function renderCategoryTabs() {
@@ -368,7 +380,6 @@
             renderMenuGrid();
         }
 
-        // Render 12 Main Menus with Dropdown Options and Attached Menu Images
         function renderMenuGrid() {
             const grid = document.getElementById('menuGrid');
             const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
@@ -396,14 +407,12 @@
                 return `
                 <div class="bg-emerald-900/80 border border-emerald-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover:border-amber-400/60 transition group">
                     <div>
-                        <!-- Image Container with Attached Menu Image -->
                         <div class="relative rounded-xl overflow-hidden bg-emerald-950 border border-emerald-800 mb-3 flex items-center justify-center">
                             <img src="${item.image}" alt="${item.name}" class="w-full h-auto object-contain group-hover:scale-105 transition duration-300">
                         </div>
 
                         <h3 class="font-bold text-base text-white group-hover:text-amber-300 transition line-clamp-1">${item.name}</h3>
                         
-                        <!-- Dropdown for Sub-options -->
                         <div class="mt-2">
                             <label class="block text-xs text-emerald-300 mb-1">เลือกรายการย่อย / ขนาด / ประเภท:</label>
                             <select id="select-opt-${item.id}" class="w-full bg-emerald-950 border border-emerald-700 rounded-lg px-3 py-2 text-xs text-amber-300 font-medium focus:outline-none focus:border-amber-400 transition">
@@ -464,12 +473,20 @@
             updateCartUI();
         }
 
+        // ฟังก์ชันลบเฉพาะรายการนั้นทิ้งทันที
+        function removeItem(key) {
+            cart = cart.filter(c => c.key !== key);
+            updateCartUI();
+        }
+
         function clearCart() {
             cart = [];
             updateCartUI();
         }
 
         function updateCartUI() {
+            localStorage.setItem('rabiang_yim_cart', JSON.stringify(cart));
+
             const cartList = document.getElementById('cartItemsList');
             const cartCountHeader = document.getElementById('cartCountHeader');
             const totalItemsCount = document.getElementById('totalItemsCount');
@@ -501,18 +518,22 @@
             }
 
             cartList.innerHTML = cart.map(item => `
-                <div class="bg-emerald-950/60 border border-emerald-800 rounded-xl p-3 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover border border-emerald-700 flex-shrink-0">
+                <div class="bg-emerald-950/60 border border-emerald-800 rounded-xl p-3 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-lg object-cover border border-emerald-700 flex-shrink-0">
                         <div class="overflow-hidden">
-                            <h4 class="text-sm font-semibold text-white truncate">${item.name}</h4>
+                            <h4 class="text-xs font-semibold text-white truncate">${item.name}</h4>
                             <p class="text-xs text-amber-400">${item.price} บาท x ${item.qty}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="changeQty('${item.key}', -1)" class="w-7 h-7 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold flex items-center justify-center transition">-</button>
-                        <span class="text-sm font-bold w-6 text-center">${item.qty}</span>
-                        <button onclick="changeQty('${item.key}', 1)" class="w-7 h-7 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold flex items-center justify-center transition">+</button>
+                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold text-xs flex items-center justify-center transition">-</button>
+                        <span class="text-xs font-bold w-5 text-center">${item.qty}</span>
+                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold text-xs flex items-center justify-center transition">+</button>
+                        <!-- ปุ่มถังขยะลบเฉพาะรายการ -->
+                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 hover:bg-red-700 text-red-300 hover:text-white rounded-lg text-xs flex items-center justify-center border border-red-800 transition" title="ลบรายการนี้">
+                            🗑️
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -522,6 +543,7 @@
             const newAmount = prompt('กรอกจำนวนเงินออมกองกลางกลุ่มใหม่ (บาท):', groupSavings);
             if (newAmount !== null && !isNaN(newAmount) && newAmount.trim() !== '') {
                 groupSavings = parseFloat(newAmount);
+                localStorage.setItem('rabiang_yim_savings', groupSavings);
                 updateSavingsDisplay();
                 updateCartUI();
             }
@@ -544,13 +566,50 @@
                 return;
             }
 
+            lastOrder = {
+                cart: JSON.parse(JSON.stringify(cart)),
+                totalPrice: totalPrice,
+                previousSavings: groupSavings
+            };
+            localStorage.setItem('rabiang_yim_lastOrder', JSON.stringify(lastOrder));
+
             groupSavings -= totalPrice;
+            localStorage.setItem('rabiang_yim_savings', groupSavings);
             updateSavingsDisplay();
             
-            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${groupSavings.toLocaleString()} บาท`, '🍽️');
+            showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${groupSavings.toLocaleString()} บาท\n\n(หากต้องการแก้ไขสามารถกดปุ่ม "ยกเลิกคำสั่งซื้อล่าสุด" ด้านล่างได้)`, '🍽️');
             
             cart = [];
             updateCartUI();
+            checkUndoButton();
+        }
+
+        function undoLastOrder() {
+            if (!lastOrder) return;
+
+            if (confirm('คุณต้องการยกเลิกคำสั่งซื้อล่าสุด เพื่อคืนเงินกองกลางและนำรายการอาหารกลับเข้าตะกร้าใช่หรือไม่?')) {
+                groupSavings = lastOrder.previousSavings;
+                localStorage.setItem('rabiang_yim_savings', groupSavings);
+                updateSavingsDisplay();
+
+                cart = lastOrder.cart;
+                updateCartUI();
+
+                lastOrder = null;
+                localStorage.removeItem('rabiang_yim_lastOrder');
+                checkUndoButton();
+
+                showModal('ยกเลิกคำสั่งซื้อสำเร็จ', 'คืนเงินกองกลางและนำรายการอาหารกลับมาในตะกร้าเรียบร้อยแล้วครับ', '↩️');
+            }
+        }
+
+        function checkUndoButton() {
+            const undoBtn = document.getElementById('undoBtn');
+            if (lastOrder) {
+                undoBtn.classList.remove('hidden');
+            } else {
+                undoBtn.classList.add('hidden');
+            }
         }
 
         function showModal(title, message, icon = '🎉') {
