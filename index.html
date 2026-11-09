@@ -744,12 +744,15 @@
 
             const newSavings = window.groupSavings - totalPrice;
             window.groupSavings = newSavings;
+            
+            // บันทึกยอดเงินใหม่และเคลียร์ตะกร้าลง Firebase ทันทีแบบถาวร
             window.saveSavingsToFirebase(newSavings);
+            window.saveCartToFirebase([]);
             
             showModal('สั่งอาหารสำเร็จ! 🎉', `หักเงินจากกองกลางเรียบร้อยแล้ว\nยอดรวม: ${totalPrice.toLocaleString()} บาท\nเงินออมคงเหลือ: ${newSavings.toLocaleString()} บาท`, '🍽️');
             
             window.cart = [];
-            window.saveCartToFirebase(window.cart);
+            updateCartUI();
         }
 
         function showModal(title, message, icon = '🎉') {
