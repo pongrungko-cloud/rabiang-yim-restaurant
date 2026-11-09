@@ -744,11 +744,15 @@
         }
 
         window.editSavings = function() {
-            const newAmount = prompt('กรอกจำนวนเงินออมกองกลางกลุ่มใหม่ (บาท):', groupSavings);
-            if (newAmount !== null && !isNaN(newAmount) && newAmount.trim() !== '') {
-                window.saveSavingsToFirebase(parseFloat(newAmount));
-            }
-        }
+    const newAmount = prompt('กรอกจำนวนเงินออมกองกลางกลุ่มใหม่ (บาท):', groupSavings);
+    if (newAmount !== null && !isNaN(newAmount) && newAmount.trim() !== '') {
+        const parsedAmount = parseFloat(newAmount);
+        groupSavings = parsedAmount;
+        window.saveSavingsToFirebase(parsedAmount); // บันทึกลง Firebase ทันที
+        updateSavingsDisplay();
+        updateCartUI();
+    }
+}
 
         window.updateSavingsDisplay = function() {
             const el = document.getElementById('savingsDisplay');
