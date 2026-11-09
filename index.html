@@ -519,18 +519,59 @@
             window.saveCartToFirebase(window.cart);
         }
 
-        window.addCustomItemToCart = function() {
-            const nameInput = document.getElementById('customItemName');
-            const priceInput = document.getElementById('customItemPrice');
-            if(!nameInput || !priceInput) return;
-            const itemName = nameInput.value.trim();
-            const itemPrice = parseFloat(priceInput.value);
+        // ฟังก์ชันปรับจำนวนสินค้า พร้อมคืนเงินหรือหักเงินกองกลางตามจริง
+        window.changeQty = function(key, delta) {
+            const index = window.cart.findIndex(c => c.key === key);
+            if (index !== -1) {
+                const item = window.cart[index];
+                
+                // ถ้าเป็นการลดจำนวนสินค้า (delta < 0) ให้คืนเงินเข้ากองกลาง
+                if (delta < 0 && item.qty > 0) {
+                    window.groupSavings += item.price;
+                    window.saveSavingsToFirebase(window.groupSavings);
+                } 
+                // ถ้าเป็นการเพิ่มจำนวนสินค้า (delta > 0) ให้เช็คว่าเงินพอไหมแล้วหักเพิ่ม
+                else if (delta > 0) {
+                    if (window.groupSavings < item.price) {
+                        showModal('เงินกองกลางไม่พอ!', 'ยอดเงินกองกลางไม่เพียงพอสำหรับเพิ่มจำนวนอาหารรายการนี้', '❌');
+                        return;
+                    }
+                    window.groupSavings -= item.price;
+                    window.saveSavingsToFirebase(window.groupSavings);
+                }
 
-            if (!itemName) { showModal('แจ้งเตือน', 'กรุณาระบุชื่อเมนูหรือเครื่องดื่ม', '⚠️'); return; }
-            if (isNaN(itemPrice) || itemPrice <= 0) { showModal('แจ้งเตือน', 'กรุณาระบุราคาที่ถูกต้อง', '⚠️'); return; }
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    window.cart.splice(index, 1);
+                }
+            }
+            window.saveCartToFirebase(window.cart);
+        }
 
-            window.cart.push({ key: `custom-${Date.now()}`, name: `⭐ ${itemName} (เมนูพิเศษ)`, price: itemPrice, image: 'ระเบียงยิ้ม เมนูแนะนำ.jpg', qty: 1 });
-            nameInput.value = ''; priceInput.value = '';
+        // ฟังก์ชันลบรายการออกจากตะกร้า พร้อมคืนเงินทั้งหมดของรายการนั้นเข้ากองกลาง
+        window.removeItem = function(key) {
+            const index = window.cart.findIndex(c => c.key === key);
+            if (index !== -1) {
+                const item = window.cart[index];
+                const refundAmount = item.price * item.qty;
+                
+                // คืนเงินเข้ากองกลางตามราคารวมของรายการที่ลบ
+                window.groupSavings += refundAmount;
+                window.saveSavingsToFirebase(window.groupSavings);
+
+                window.cart.splice(index, 1);
+            }
+            window.saveCartToFirebase(window.cart);
+        }
+
+        // ฟังก์ชันล้างตะกร้าทั้งหมด พร้อมคืนเงินทั้งหมดที่เคยหักกลับเข้ากองกลาง
+        window.clearCart = function() {
+            const totalRefund = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            if (totalRefund > 0) {
+                window.groupSavings += totalRefund;
+                window.saveSavingsToFirebase(window.groupSavings);
+            }
+            window.cart = [];
             window.saveCartToFirebase(window.cart);
         }
 
