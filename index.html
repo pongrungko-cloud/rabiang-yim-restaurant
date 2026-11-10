@@ -140,8 +140,8 @@
         </div>
     </div>
 
-    <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป (ซ่อนไว้ปกติ จะแสดงเฉพาะตอนกดโหลด) -->
-    <div id="receiptSlip" class="hidden fixed -top-[9999px] left-0 p-6 bg-emerald-900 text-white rounded-2xl w-96 space-y-4 border border-emerald-700 shadow-2xl">
+    <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป (ปรับตำแหน่งและขนาดให้ยืดหยุ่นไม่ถูกตัดทอน) -->
+    <div id="receiptSlip" class="hidden absolute top-0 left-0 p-8 bg-emerald-900 text-white rounded-2xl w-[420px] space-y-4 border border-emerald-700 shadow-2xl z-50">
         <div class="text-center border-b border-emerald-700 pb-3">
             <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-800 border border-amber-400 flex items-center justify-center text-amber-300 font-bold">🌿</div>
             <h2 class="text-base font-bold text-amber-300">ร้านอาหารระเบียงยิ้ม</h2>
@@ -764,7 +764,7 @@
             renderMenuGrid();
         };
 
-        // ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (รองรับทั้งคอมพิวเตอร์และมือถือ/iPad)
+        // ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (รองรับทั้งคอมพิวเตอร์และมือถือ/iPad พร้อมปรับความสูงไม่ให้โดนตัด)
         window.downloadSlip = function() {
             const slipListEl = document.getElementById('slipItemsList');
             const slipTotalEl = document.getElementById('slipTotalPrice');
@@ -776,7 +776,7 @@
             if(slipListEl) {
                 slipListEl.innerHTML = window.cart.map(item => `
                     <div class="flex justify-between py-1 text-xs">
-                        <span class="text-white truncate max-w-[200px]">• ${item.name} x ${item.qty}</span>
+                        <span class="text-white truncate max-w-[240px]">• ${item.name} x ${item.qty}</span>
                         <span class="text-amber-300 font-semibold">${item.price * item.qty} บาท</span>
                     </div>
                 `).join('');
@@ -791,14 +791,20 @@
                 return;
             }
 
-            slipElement.classList.remove('hidden'); // แสดงชั่วคราวเพื่อให้ html2canvas อ่านค่าได้
+            // แสดงชั่วคราวแบบโปร่งใสเพื่อให้ html2canvas เรนเดอร์ความสูงได้ครบถ้วน
+            slipElement.classList.remove('hidden');
+            slipElement.classList.add('opacity-0');
             
-            html2canvas(slipElement, { scale: 2, backgroundColor: '#064e3b', useCORS: true }).then(canvas => {
-                slipElement.classList.add('hidden'); // ซ่อนกลับเหมือนเดิม
+            html2canvas(slipElement, { 
+                scale: 2, 
+                backgroundColor: '#064e3b', 
+                useCORS: true,
+                scrollY: -window.scrollY
+            }).then(canvas => {
+                slipElement.classList.add('hidden');
+                slipElement.classList.remove('opacity-0');
 
                 const imageURL = canvas.toDataURL('image/png');
-
-                // ตรวจสอบว่าเป็นมือถือ/iPad หรือไม่ เพื่อใช้ระบบเปิดรูปหรือแชร์แทนการดาวน์โหลดตรงๆ
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
                 if (isMobile) {
@@ -808,7 +814,7 @@
                             <html>
                                 <head><title>สลิปรายการอาหาร - ระเบียงยิ้ม</title></head>
                                 <body style="background:#064e3b; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; color:#fff; font-family:sans-serif;">
-                                    <p style="margin-bottom:15px; font-size:14px; color:#fde047;">📱 กดค้างที่รูปภาพด้านล่าง แล้วเลือก "บันทึกรูปภาพ" หรือ "Add to Photos"</p>
+                                    <p style="margin-bottom:15px; font-size:14px; color:#fde047;">📱 กดค้างที่รูปภาพด้านล่าง แล้วเลือก "บันทึกรูปภาพ"</p>
                                     <img src="${imageURL}" style="max-width:90%; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" />
                                 </body>
                             </html>
@@ -822,6 +828,7 @@
             }).catch(err => {
                 console.error("Error generating slip:", err);
                 slipElement.classList.add('hidden');
+                slipElement.classList.remove('opacity-0');
             });
         }
 
