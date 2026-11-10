@@ -739,7 +739,7 @@ if (window.isOrderConfirmed) {
             renderMenuGrid();
         };
     
-// ฟังก์ชันดาวน์โหลดสลิปรายการอาหารเป็นรูปภาพ
+// ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (รองรับทั้งคอมพิวเตอร์และมือถือ/iPad)
         window.downloadSlip = function() {
             const slipListEl = document.getElementById('slipItemsList');
             const slipTotalEl = document.getElementById('slipTotalPrice');
@@ -765,6 +765,51 @@ if (window.isOrderConfirmed) {
                 alert('ไม่พบโครงสร้างสลิป (receiptSlip)');
                 return;
             }
+
+            slipElement.classList.remove('hidden'); // แสดงชั่วคราวเพื่อให้ html2canvas อ่านค่าได้
+            
+            html2canvas(slipElement, { scale: 2, backgroundColor: '#064e3b', useCORS: true }).then(canvas => {
+                slipElement.classList.add('hidden'); // ซ่อนกลับเหมือนเดิม
+
+                const imageURL = canvas.toDataURL('image/png');
+
+                // ตรวจสอบว่าเป็นมือถือ/iPad หรือไม่ เพื่อใช้ระบบเปิดรูปหรือแชร์แทนการดาวน์โหลดตรงๆ
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    // ถ้าเป็นมือถือ ให้เปิดรูปในแท็บใหม่ เพื่อให้ผู้ใช้กดค้างที่รูปแล้วเลือก "Add to Photos" หรือ "บันทึกรูปภาพ" ได้เลย
+                    const newWindow = window.open();
+                    if (newWindow) {
+                        newWindow.document.write(`
+                            <html>
+                                <head><title>สลิปรายการอาหาร - ระเบียงยิ้ม</title></head>
+                                <body style="background:#064e3b; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; color:#fff; font-family:sans-serif;">
+                                    <p style="margin-bottom:15px; font-size:14px; color:#fde047;">📱 กดค้างที่รูปภาพด้านล่าง แล้วเลือก "บันทึกรูปภาพ" หรือ "Add to Photos"</p>
+                                    <img src="${imageURL}" style="max-width:90%; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" />
+                                </body>
+                            </html>
+                        `);
+                    } else {
+                        // เผื่อเบราว์เซอร์บล็อก pop-up ให้ fallback เป็นการดาวน์โหลดปกติ
+                        triggerDownload(imageURL);
+                    }
+                } else {
+                    // ถ้าเป็นคอมพิวเตอร์ ใช้ระบบดาวน์โหลดปกติ
+                    triggerDownload(imageURL);
+                }
+            }).catch(err => {
+                console.error("Error generating slip:", err);
+                slipElement.classList.add('hidden');
+            });
+        }
+
+        // ฟังก์ชันช่วยดาวน์โหลดสำหรับคอมพิวเตอร์
+        function triggerDownload(url) {
+            const link = document.createElement('a');
+            link.download = `Slip-RabiangYim-${Date.now()}.png`;
+            link.href = url;
+            link.click();
+        }
 
             slipElement.classList.remove('hidden'); // แสดงชั่วคราวเพื่อให้ html2canvas อ่านค่าได้
             
