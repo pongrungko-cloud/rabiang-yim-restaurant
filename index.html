@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป (ปรับตำแหน่งและขนาดให้ยืดหยุ่นไม่ถูกตัดทอน) -->
+    <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป -->
     <div id="receiptSlip" class="hidden absolute top-0 left-0 p-8 bg-emerald-900 text-white rounded-2xl w-[420px] space-y-4 border border-emerald-700 shadow-2xl z-50">
         <div class="text-center border-b border-emerald-700 pb-3">
             <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-800 border border-amber-400 flex items-center justify-center text-amber-300 font-bold">🌿</div>
@@ -764,7 +764,7 @@
             renderMenuGrid();
         };
 
-        // ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (รองรับทั้งคอมพิวเตอร์และมือถือ/iPad พร้อมปรับความสูงไม่ให้โดนตัด)
+        // ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (ปรับแก้ให้ชื่อเมนูปัดบรรทัดแสดงผลครบถ้วนไม่โดนตัด)
         window.downloadSlip = function() {
             const slipListEl = document.getElementById('slipItemsList');
             const slipTotalEl = document.getElementById('slipTotalPrice');
@@ -775,9 +775,9 @@
             
             if(slipListEl) {
                 slipListEl.innerHTML = window.cart.map(item => `
-                    <div class="flex justify-between py-1 text-xs">
-                        <span class="text-white truncate max-w-[240px]">• ${item.name} x ${item.qty}</span>
-                        <span class="text-amber-300 font-semibold">${item.price * item.qty} บาท</span>
+                    <div class="flex justify-between items-start py-1.5 text-xs gap-4">
+                        <span class="text-white break-words flex-1">• ${item.name} x ${item.qty}</span>
+                        <span class="text-amber-300 font-semibold whitespace-nowrap">${item.price * item.qty} บาท</span>
                     </div>
                 `).join('');
             }
