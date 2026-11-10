@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="th" class="h-full">
 <head>
-<!-- เพิ่ม Script สำหรับแคปเจอร์รูปภาพสลิป -->
+    <!-- เพิ่ม Script สำหรับแคปเจอร์รูปภาพสลิป -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,6 +136,31 @@
             <p id="modalMessage" class="text-sm text-emerald-100">ข้อความรายละเอียด...</p>
             <div id="modalActionArea" class="pt-2">
                 <button onclick="closeModal()" class="bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold px-6 py-2 rounded-xl transition">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป (ซ่อนไว้ปกติ จะแสดงเฉพาะตอนกดโหลด) -->
+    <div id="receiptSlip" class="hidden fixed -top-[9999px] left-0 p-6 bg-emerald-900 text-white rounded-2xl w-96 space-y-4 border border-emerald-700 shadow-2xl">
+        <div class="text-center border-b border-emerald-700 pb-3">
+            <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-800 border border-amber-400 flex items-center justify-center text-amber-300 font-bold">🌿</div>
+            <h2 class="text-base font-bold text-amber-300">ร้านอาหารระเบียงยิ้ม</h2>
+            <p class="text-xs text-emerald-300">สลิปยืนยันรายการอาหารและหักเงินกองกลาง</p>
+        </div>
+        <div id="slipItemsList" class="text-xs space-y-2 divide-y divide-emerald-800/60">
+            <!-- รายการอาหารจะถูกดึงมาแสดงตรงนี้อัตโนมัติ -->
+        </div>
+        <div class="border-t border-emerald-700 pt-3 space-y-1 text-xs">
+            <div class="flex justify-between font-bold text-amber-300">
+                <span>ยอดรวมทั้งสิ้น:</span>
+                <span id="slipTotalPrice">0 บาท</span>
+            </div>
+            <div class="flex justify-between text-emerald-300 text-[10px]">
+                <span>เงินกองกลางคงเหลือ:</span>
+                <span id="slipRemainingSavings">0 บาท</span>
+            </div>
+            <div class="text-center text-[10px] text-emerald-400 pt-2 border-t border-emerald-800">
+                🕒 บันทึกข้อมูลแบบ Real-time ณ วันที่: <span id="slipTimestamp">-</span>
             </div>
         </div>
     </div>
@@ -603,21 +628,21 @@
             if(totalPriceDisplay) totalPriceDisplay.innerText = `${totalPrice.toLocaleString()} บาท`;
             if(remainingSavingsDisplay) remainingSavingsDisplay.innerText = `${remaining.toLocaleString()} บาท`;
 
-           // จัดการ UI ตามสถานะการยืนยันออเดอร์
-if (window.isOrderConfirmed) {
-    orderStatusBanner.classList.remove('hidden');
-    clearCartBtn.classList.add('hidden');
-    actionButtonArea.innerHTML = `
-        <div class="space-y-2">
-            <button onclick="downloadSlip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs">
-                <span>📥 ดาวน์โหลดสลิปรายการอาหาร</span>
-            </button>
-            <button onclick="unlockOrder()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
-                <span>🔓 ปลดล็อก / แก้ไขออเดอร์ (คืนเงิน)</span>
-            </button>
-        </div>
-    `;
-} else {
+            // จัดการ UI ตามสถานะการยืนยันออเดอร์
+            if (window.isOrderConfirmed) {
+                orderStatusBanner.classList.remove('hidden');
+                clearCartBtn.classList.add('hidden');
+                actionButtonArea.innerHTML = `
+                    <div class="space-y-2">
+                        <button onclick="downloadSlip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs">
+                            <span>📥 ดาวน์โหลดสลิปรายการอาหาร</span>
+                        </button>
+                        <button onclick="unlockOrder()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                            <span>🔓 ปลดล็อก / แก้ไขออเดอร์ (คืนเงิน)</span>
+                        </button>
+                    </div>
+                `;
+            } else {
                 orderStatusBanner.classList.add('hidden');
                 clearCartBtn.classList.remove('hidden');
                 actionButtonArea.innerHTML = `
@@ -738,8 +763,8 @@ if (window.isOrderConfirmed) {
             renderCategoryTabs();
             renderMenuGrid();
         };
-    
-// ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (รองรับทั้งคอมพิวเตอร์และมือถือ/iPad)
+
+        // ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (รองรับทั้งคอมพิวเตอร์และมือถือ/iPad)
         window.downloadSlip = function() {
             const slipListEl = document.getElementById('slipItemsList');
             const slipTotalEl = document.getElementById('slipTotalPrice');
@@ -777,7 +802,6 @@ if (window.isOrderConfirmed) {
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
                 if (isMobile) {
-                    // ถ้าเป็นมือถือ ให้เปิดรูปในแท็บใหม่ เพื่อให้ผู้ใช้กดค้างที่รูปแล้วเลือก "Add to Photos" หรือ "บันทึกรูปภาพ" ได้เลย
                     const newWindow = window.open();
                     if (newWindow) {
                         newWindow.document.write(`
@@ -790,11 +814,9 @@ if (window.isOrderConfirmed) {
                             </html>
                         `);
                     } else {
-                        // เผื่อเบราว์เซอร์บล็อก pop-up ให้ fallback เป็นการดาวน์โหลดปกติ
                         triggerDownload(imageURL);
                     }
                 } else {
-                    // ถ้าเป็นคอมพิวเตอร์ ใช้ระบบดาวน์โหลดปกติ
                     triggerDownload(imageURL);
                 }
             }).catch(err => {
@@ -810,43 +832,6 @@ if (window.isOrderConfirmed) {
             link.href = url;
             link.click();
         }
-
-            slipElement.classList.remove('hidden'); // แสดงชั่วคราวเพื่อให้ html2canvas อ่านค่าได้
-            
-            html2canvas(slipElement, { scale: 2, backgroundColor: '#064e3b' }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Slip-RabiangYim-${Date.now()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                slipElement.classList.add('hidden'); // ซ่อนกลับเหมือนเดิมหลังดาวน์โหลดเสร็จ
-            }).catch(err => {
-                console.error("Error generating slip:", err);
-                slipElement.classList.add('hidden');
-            });
-        }</script>
-<!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป (ซ่อนไว้ปกติ จะแสดงเฉพาะตอนกดโหลด) -->
-    <div id="receiptSlip" class="hidden fixed -top-[9999px] left-0 p-6 bg-emerald-900 text-white rounded-2xl w-96 space-y-4 border border-emerald-700 shadow-2xl">
-        <div class="text-center border-b border-emerald-700 pb-3">
-            <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-800 border border-amber-400 flex items-center justify-center text-amber-300 font-bold">🌿</div>
-            <h2 class="text-base font-bold text-amber-300">ร้านอาหารระเบียงยิ้ม</h2>
-            <p class="text-xs text-emerald-300">สลิปยืนยันรายการอาหารและหักเงินกองกลาง</p>
-        </div>
-        <div id="slipItemsList" class="text-xs space-y-2 divide-y divide-emerald-800/60">
-            <!-- รายการอาหารจะถูกดึงมาแสดงตรงนี้อัตโนมัติ -->
-        </div>
-        <div class="border-t border-emerald-700 pt-3 space-y-1 text-xs">
-            <div class="flex justify-between font-bold text-amber-300">
-                <span>ยอดรวมทั้งสิ้น:</span>
-                <span id="slipTotalPrice">0 บาท</span>
-            </div>
-            <div class="flex justify-between text-emerald-300 text-[10px]">
-                <span>เงินกองกลางคงเหลือ:</span>
-                <span id="slipRemainingSavings">0 บาท</span>
-            </div>
-            <div class="text-center text-[10px] text-emerald-400 pt-2 border-t border-emerald-800">
-                🕒 บันทึกข้อมูลแบบ Real-time ณ วันที่: <span id="slipTimestamp">-</span>
-            </div>
-        </div>
-    </div>
+    </script>
 </body>
 </html>
