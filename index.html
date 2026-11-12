@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="th" class="h-full">
 <head>
-    <!-- เพิ่ม Script สำหรับแคปเจอร์รูปภาพสลิป -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>กินเลี้ยง MN Team A 19 Dec 2026 ร้านอาหารระเบียงยิ้ม - สั่งอาหารและจัดการเงินกองกลาง</title>
@@ -16,19 +14,15 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #14532d; border-radius: 4px; }
 
-        /* --- เอฟเฟกต์ไฟเรืองแสงเมื่อเอาเมาส์ไปชี้ (Hover Neon Glow) --- */
         .hover-neon-effect {
             transition: all 0.3s ease-in-out;
         }
-
         .hover-neon-effect:hover {
             transform: translateY(-3px);
             border-color: #f59e0b !important;
             box-shadow: 0 0 20px rgba(245, 158, 11, 0.5), 
                         inset 0 0 10px rgba(245, 158, 11, 0.2);
         }
-
-        /* เอฟเฟกต์เรืองแสงสำหรับปุ่มทั่วไปเมื่อชี้ */
         .hover-btn-glow {
             transition: all 0.3s ease-in-out;
         }
@@ -157,29 +151,6 @@
             <p id="modalMessage" class="text-sm text-emerald-100">ข้อความรายละเอียด...</p>
             <div id="modalActionArea" class="pt-2">
                 <button onclick="closeModal()" class="bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold px-6 py-2 rounded-xl transition hover-btn-glow">ตกลง</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป -->
-    <div id="receiptSlip" class="opacity-0 pointer-events-none absolute -top-[9999px] left-0 p-8 bg-emerald-900 text-white rounded-2xl w-[420px] space-y-4 border border-emerald-700 shadow-2xl z-50">
-        <div class="text-center border-b border-emerald-700 pb-3">
-            <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-800 border border-amber-400 flex items-center justify-center text-amber-300 font-bold">🌿</div>
-            <h2 class="text-base font-bold text-amber-300">ร้านอาหารระเบียงยิ้ม</h2>
-            <p class="text-xs text-emerald-300">สลิปยืนยันรายการอาหารและหักเงินกองกลาง</p>
-        </div>
-        <div id="slipItemsList" class="text-xs space-y-2 divide-y divide-emerald-800/60"></div>
-        <div class="border-t border-emerald-700 pt-3 space-y-1 text-xs">
-            <div class="flex justify-between font-bold text-amber-300">
-                <span>ยอดรวมทั้งสิ้น:</span>
-                <span id="slipTotalPrice">0 บาท</span>
-            </div>
-            <div class="flex justify-between text-emerald-300 text-[10px]">
-                <span>เงินกองกลางคงเหลือ:</span>
-                <span id="slipRemainingSavings">0 บาท</span>
-            </div>
-            <div class="text-center text-[10px] text-emerald-400 pt-2 border-t border-emerald-800">
-                🕒 บันทึกข้อมูลแบบ Real-time ณ วันที่: <span id="slipTimestamp">-</span>
             </div>
         </div>
     </div>
@@ -653,7 +624,7 @@
                 actionButtonArea.innerHTML = `
                     <div class="space-y-2">
                         <button onclick="downloadSlip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs hover-btn-glow">
-                            <span>📥 ดาวน์โหลดสลิปรายการอาหาร</span>
+                            <span>📥 ดาวน์โหลดสลิปรายการอาหาร (เปิดรูปภาพ)</span>
                         </button>
                         <button onclick="unlockOrder()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs hover-btn-glow">
                             <span>🔓 ปลดล็อก / แก้ไขออเดอร์ (คืนเงิน)</span>
@@ -782,86 +753,63 @@
             renderMenuGrid();
         };
 
-        // ฟังก์ชันดาวน์โหลดสลิป
+        // ฟังก์ชันดาวน์โหลดสลิปแบบใหม่: สร้างหน้าต่างพรีวิว HTML ให้กดบันทึกหรือปริ้นท์ได้ทันที
         window.downloadSlip = function() {
-            const slipListEl = document.getElementById('slipItemsList');
-            const slipTotalEl = document.getElementById('slipTotalPrice');
-            const slipRemainingEl = document.getElementById('slipRemainingSavings');
-            const slipTimeEl = document.getElementById('slipTimestamp');
-
             const totalPrice = window.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            
-            if(slipListEl) {
-                slipListEl.innerHTML = window.cart.map(item => `
-                    <div class="flex justify-between items-start py-1.5 text-xs gap-4">
-                        <span class="text-white break-words flex-1">• ${item.name} x ${item.qty}</span>
-                        <span class="text-amber-300 font-semibold whitespace-nowrap">${item.price * item.qty} บาท</span>
-                    </div>
-                `).join('');
-            }
-            if(slipTotalEl) slipTotal_el = slipTotalPrice.innerText = `${totalPrice.toLocaleString()} บาท`; // Fix scope reference
-            if(slipTotalEl) slipTotalEl.innerText = `${totalPrice.toLocaleString()} บาท`;
-            if(slipRemainingEl) slipRemainingEl.innerText = `${window.groupSavings.toLocaleString()} บาท`;
-            if(slipTimeEl) slipTimeEl.innerText = new Date().toLocaleString('th-TH');
+            const itemsHtml = window.cart.map(item => `
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #065f46; font-size:14px;">
+                    <span>• ${item.name} x ${item.qty}</span>
+                    <span style="font-weight:bold; color:#fde047;">${item.price * item.qty} บาท</span>
+                </div>
+            `).join('');
 
-            const slipElement = document.getElementById('receiptSlip');
-            if(!slipElement) {
-                alert('ไม่พบโครงสร้างสลิป (receiptSlip)');
+            const slipWindow = window.open('', '_blank');
+            if (!slipWindow) {
+                alert('กรุณาอนุญาตให้เว็บไซต์เปิดหน้าต่างป๊อปอัป (Popup Blocker)');
                 return;
             }
 
-            slipElement.classList.remove('opacity-0', 'pointer-events-none');
-            slipElement.style.position = 'fixed';
-            slipElement.style.top = '0';
-            slipElement.style.left = '0';
-            slipElement.style.zIndex = '9999';
-
-            setTimeout(() => {
-                html2canvas(slipElement, { 
-                    scale: 2, 
-                    backgroundColor: '#064e3b', 
-                    useCORS: true,
-                    windowWidth: document.documentElement.offsetWidth
-                }).then(canvas => {
-                    slipElement.classList.add('opacity-0', 'pointer-events-none');
-                    slipElement.style.position = 'absolute';
-                    slipElement.style.top = '-9999px';
-
-                    const imageURL = canvas.toDataURL('image/png');
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-                    if (isMobile) {
-                        const newWindow = window.open();
-                        if (newWindow) {
-                            newWindow.document.write(`
-                                <html>
-                                    <head><title>สลิปรายการอาหาร - -> ระเบียงยิ้ม</title></head>
-                                    <body style="background:#064e3b; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; color:#fff; font-family:sans-serif;">
-                                        <p style="margin-bottom:15px; font-size:14px; color:#fde047;">📱 กดค้างที่รูปภาพด้านล่าง แล้วเลือก "บันทึกรูปภาพ"</p>
-                                        <img src="${imageURL}" style="max-width:90%; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" />
-                                    </body>
-                                </html>
-                            `);
-                        } else {
-                            triggerDownload(imageURL);
-                        }
-                    } else {
-                        triggerDownload(imageURL);
-                    }
-                }).catch(err => {
-                    console.error("Error generating slip:", err);
-                    slipElement.classList.add('opacity-0', 'pointer-events-none');
-                    slipElement.style.position = 'absolute';
-                    slipElement.style.top = '-9999px';
-                });
-            }, 300);
-        }
-
-        function triggerDownload(url) {
-            const link = document.createElement('a');
-            link.download = `Slip-RabiangYim-${Date.now()}.png`;
-            link.href = url;
-            link.click();
+            slipWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="th">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>สลิปรายการอาหาร - ระเบียงยิ้ม</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Prompt', sans-serif; background: #022c22; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+                        .slip-box { background: #064e3b; border: 2px solid #059669; border-radius: 16px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+                        .btn { background: #f59e0b; color: #022c22; font-weight: bold; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; margin-top: 16px; font-size: 14px; }
+                        .btn:hover { background: #d97706; }
+                        @media print { .no-print { display: none; } body { background: #fff; color: #000; } .slip-box { border: none; box-shadow: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="slip-box">
+                        <div style="text-align:center; border-bottom:2px solid #059669; padding-bottom:12px; margin-bottom:12px;">
+                            <h2 style="color:#fde047; margin:0 0 4px 0; font-size:18px;">🌿 ร้านอาหารระเบียงยิ้ม</h2>
+                            <p style="font-size:12px; color:#a7f3d0; margin:0;">สลิปยืนยันรายการอาหารและหักเงินกองกลาง</p>
+                        </div>
+                        <div>${itemsHtml}</div>
+                        <div style="border-top:2px solid #059669; padding-top:12px; margin-top:12px; font-size:14px;">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; color:#fde047; font-size:16px;">
+                                <span>ยอดรวมทั้งสิ้น:</span>
+                                <span>${totalPrice.toLocaleString()} บาท</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; color:#a7f3d0; font-size:12px; margin-top:4px;">
+                                <span>เงินกองกลางคงเหลือ:</span>
+                                <span>${window.groupSavings.toLocaleString()} บาท</span>
+                            </div>
+                            <div style="text-align:center; font-size:10px; color:#6ee7b7; margin-top:12px; border-top:1px dashed #059669; padding-top:8px;">
+                                🕒 วันที่บันทึก: ${new Date().toLocaleString('th-TH')}
+                            </div>
+                        </div>
+                        <button onclick="window.print()" class="btn no-print">🖨️ บันทึกเป็น PDF / สั่งพิมพ์</button>
+                    </div>
+                </body>
+                </html>
+            `);
+            slipWindow.document.close();
         }
     </script>
 </body>
