@@ -15,35 +15,83 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #14532d; border-radius: 4px; }
+
+        /* --- เอฟเฟกต์ไฟวิ่งตามขอบ (Border Running Animation สำหรับ Header และ Sidebar) --- */
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .neon-border-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            padding: 2px;
+        }
+
+        .neon-border-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: conic-gradient(from 0deg, transparent 0%, transparent 60%, #f59e0b 85%, #10b981 95%, #f59e0b 100%);
+            animation: borderRotate 5s linear infinite;
+        }
+
+        .neon-glow-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), inset 0 0 10px rgba(245, 158, 11, 0.15);
+        }
+
+        /* --- เอฟเฟกต์ไฟเรืองแสงเมื่อเอาเมาส์ไปชี้ (Hover Neon Glow) --- */
+        .hover-neon-effect {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .hover-neon-effect:hover {
+            transform: translateY(-3px);
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5), 
+                        inset 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+
+        /* เอฟเฟกต์เรืองแสงสำหรับปุ่มทั่วไปเมื่อชี้ */
+        .hover-btn-glow {
+            transition: all 0.3s ease-in-out;
+        }
+        .hover-btn-glow:hover {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="bg-emerald-950 text-gray-100 min-h-full flex flex-col">
 
-    <!-- Header Section -->
-    <header class="bg-emerald-900 border-b border-emerald-800 sticky top-0 z-30 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-emerald-700 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-bold text-xl shadow">🌿</div>
-                <div>
-                    <h1 class="text-2xl font-bold text-amber-300 tracking-wide">กินเลี้ยง MN Team A 19 Dec 2026 ร้านอาหารระเบียงยิ้ม</h1>
-                    <p class="text-xs text-emerald-300">ระบบสั่งอาหารกลุ่ม ซิงค์ข้อมูล Real-time ทุกเครื่อง</p>
-                </div>
-            </div>
-
-            <!-- Group Savings Fund Widget -->
-            <div class="bg-emerald-950/80 border border-emerald-700/60 rounded-xl p-3 flex items-center gap-4 shadow-inner">
-                <div>
-                    <p class="text-xs text-emerald-400 font-medium">💰 เงินออมกองกลางกลุ่ม</p>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span id="savingsDisplay" class="text-lg font-bold text-amber-400">5,000</span>
-                        <span class="text-xs text-gray-300">บาท</span>
-                        <button onclick="editSavings()" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-amber-300 px-2 py-0.5 rounded border border-emerald-600 transition">แก้ไขงบ</button>
+    <!-- Header Section พร้อมไฟวิ่งเรืองแสง -->
+    <header class="sticky top-0 z-30 shadow-2xl p-1 bg-emerald-950">
+        <div class="neon-border-wrapper neon-glow-emerald w-full">
+            <div class="relative bg-emerald-900 rounded-[calc(1rem-2px)] px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4 z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-emerald-700 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-bold text-xl shadow-[0_0_15px_rgba(245,158,11,0.5)]">🌿</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-amber-300 tracking-wide">กินเลี้ยง MN Team A 19 Dec 2026 ร้านอาหารระเบียงยิ้ม</h1>
+                        <p class="text-xs text-emerald-300">ระบบสั่งอาหารกลุ่ม ซิงค์ข้อมูล Real-time ทุกเครื่อง</p>
                     </div>
                 </div>
-                <div class="h-8 w-px bg-emerald-800"></div>
-                <div>
-                    <p class="text-xs text-emerald-400 font-medium">🛒 ตะกร้าสินค้า</p>
-                    <p class="text-sm font-semibold text-white"><span id="cartCountHeader">0</span> รายการ</p>
+
+                <!-- Group Savings Fund Widget -->
+                <div class="bg-emerald-950/80 border border-emerald-700/60 rounded-xl p-3 flex items-center gap-4 shadow-inner hover-neon-effect">
+                    <div>
+                        <p class="text-xs text-emerald-400 font-medium">💰 เงินออมกองกลางกลุ่ม</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span id="savingsDisplay" class="text-lg font-bold text-amber-400">5,000</span>
+                            <span class="text-xs text-gray-300">บาท</span>
+                            <button onclick="editSavings()" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-amber-300 px-2 py-0.5 rounded border border-emerald-600 transition hover-btn-glow">แก้ไขงบ</button>
+                        </div>
+                    </div>
+                    <div class="h-8 w-px bg-emerald-800"></div>
+                    <div>
+                        <p class="text-xs text-emerald-400 font-medium">🛒 ตะกร้าสินค้า</p>
+                        <p class="text-sm font-semibold text-white"><span id="cartCountHeader">0</span> รายการ</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -54,7 +102,7 @@
         
         <!-- Menu Section -->
         <section class="lg:col-span-2 flex flex-col gap-6">
-            <div class="bg-emerald-900/90 border border-amber-500/50 rounded-2xl p-4 shadow-xl">
+            <div class="bg-emerald-900/90 border border-amber-500/50 rounded-2xl p-4 shadow-xl hover-neon-effect">
                 <h3 class="text-sm font-bold text-amber-300 mb-2 flex items-center gap-1.5">
                     <span>✨</span> เพิ่มเมนูอื่นๆ / เครื่องดื่ม นอกเหนือจากรายการ
                 </h3>
@@ -64,7 +112,7 @@
                     <input type="number" id="customItemPrice" placeholder="ราคา (บาท)" 
                         class="sm:col-span-3 bg-emerald-950 border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
                     <button onclick="addCustomItemToCart()" 
-                        class="sm:col-span-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold px-3 py-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
+                        class="sm:col-span-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold px-3 py-2 rounded-xl text-xs transition shadow flex items-center justify-center gap-1 hover-btn-glow">
                         <span>+ เพิ่ม</span>
                     </button>
                 </div>
@@ -72,7 +120,7 @@
 
             <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoryTabs"></div>
 
-            <div class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-emerald-900/60 p-4 rounded-xl border border-emerald-800 backdrop-blur-sm">
+            <div class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-emerald-900/60 p-4 rounded-xl border border-emerald-800 backdrop-blur-sm hover-neon-effect">
                 <div class="relative w-full sm:w-72">
                     <input type="text" id="searchInput" placeholder="ค้นหาชื่อเมนูอาหาร..." oninput="filterMenu()"
                         class="w-full bg-emerald-950 border border-emerald-700 rounded-lg px-4 py-2 text-sm text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 transition">
@@ -85,44 +133,46 @@
             <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- Sidebar: Cart & Order Summary -->
+        <!-- Sidebar: Cart & Order Summary พร้อมไฟวิ่งเรืองแสง -->
         <aside class="flex flex-col gap-6">
-            <div class="bg-emerald-900/90 border border-emerald-700 rounded-2xl p-5 shadow-xl sticky top-24 flex flex-col h-[calc(100vh-7rem)]">
-                <div class="flex items-center justify-between pb-4 border-b border-emerald-800">
-                    <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2"><span>📋</span> รายการอาหารในตะกร้า</h2>
-                    <button onclick="clearCart()" id="clearCartBtn" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition">ล้างตะกร้า</button>
-                </div>
-
-                <!-- Status Banner -->
-                <div id="orderStatusBanner" class="hidden my-2 p-2.5 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 text-xs text-center font-semibold">
-                    🔒 ออเดอร์นี้ถูกยืนยันและตัดเงินกองกลางแล้ว
-                </div>
-
-                <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
-                    <div class="text-center text-emerald-400 py-10 text-sm">ยังไม่มีรายการอาหารในตะกร้า<br>เลือกเมนูทางด้านซ้ายเพื่อสั่งอาหาร</div>
-                </div>
-
-                <div class="pt-4 border-t border-emerald-800 space-y-2">
-                    <div class="flex justify-between text-sm text-emerald-300">
-                        <span>จำนวนอาหารทั้งหมด:</span>
-                        <span id="totalItemsCount" class="font-semibold text-white">0 จาน/ถ้วย</span>
+            <div class="sticky top-28 neon-border-wrapper neon-glow-emerald bg-emerald-950 shadow-2xl">
+                <div class="relative bg-emerald-900/95 rounded-[calc(1rem-2px)] p-5 flex flex-col h-[calc(100vh-9rem)] z-10">
+                    <div class="flex items-center justify-between pb-4 border-b border-emerald-800">
+                        <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2"><span>📋</span> รายการอาหารในตะกร้า</h2>
+                        <button onclick="clearCart()" id="clearCartBtn" class="text-xs text-red-300 hover:text-red-100 bg-red-950/40 px-2 py-1 rounded border border-red-800 transition hover-btn-glow">ล้างตะกร้า</button>
                     </div>
-                    <div class="flex justify-between text-base font-bold text-amber-300">
-                        <span>ราคารวมทั้งสิ้น:</span>
-                        <span id="totalPriceDisplay" class="text-lg">0 บาท</span>
-                    </div>
-                    <div class="flex justify-between text-xs text-emerald-400 pt-1 border-t border-emerald-800/60">
-                        <span>เงินออมคงเหลือในกองกลาง:</span>
-                        <span id="remainingSavingsDisplay" class="font-semibold text-white">5,000 บาท</span>
-                    </div>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="mt-4 space-y-2" id="actionButtonArea">
-                    <button onclick="checkoutOrder()" id="checkoutBtn"
-                        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                        <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
-                    </button>
+                    <!-- Status Banner -->
+                    <div id="orderStatusBanner" class="hidden my-2 p-2.5 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-300 text-xs text-center font-semibold">
+                        🔒 ออเดอร์นี้ถูกยืนยันและตัดเงินกองกลางแล้ว
+                    </div>
+
+                    <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
+                        <div class="text-center text-emerald-400 py-10 text-sm">ยังไม่มีรายการอาหารในตะกร้า<br>เลือกเมนูทางด้านซ้ายเพื่อสั่งอาหาร</div>
+                    </div>
+
+                    <div class="pt-4 border-t border-emerald-800 space-y-2">
+                        <div class="flex justify-between text-sm text-emerald-300">
+                            <span>จำนวนอาหารทั้งหมด:</span>
+                            <span id="totalItemsCount" class="font-semibold text-white">0 จาน/ถ้วย</span>
+                        </div>
+                        <div class="flex justify-between text-base font-bold text-amber-300">
+                            <span>ราคารวมทั้งสิ้น:</span>
+                            <span id="totalPriceDisplay" class="text-lg">0 บาท</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-emerald-400 pt-1 border-t border-emerald-800/60">
+                            <span>เงินออมคงเหลือในกองกลาง:</span>
+                            <span id="remainingSavingsDisplay" class="font-semibold text-white">5,000 บาท</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-4 space-y-2" id="actionButtonArea">
+                        <button onclick="checkoutOrder()" id="checkoutBtn"
+                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 hover-btn-glow">
+                            <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -130,26 +180,24 @@
 
     <!-- Notification Modal -->
     <div id="customModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-emerald-900 border border-emerald-600 rounded-2xl max-w-md w-full p-6 shadow-2xl text-center space-y-4">
+        <div class="bg-emerald-900 border border-emerald-600 rounded-2xl max-w-md w-full p-6 shadow-2xl text-center space-y-4 hover-neon-effect">
             <div id="modalIcon" class="text-4xl">🎉</div>
             <h3 id="modalTitle" class="text-xl font-bold text-amber-300">แจ้งเตือน</h3>
             <p id="modalMessage" class="text-sm text-emerald-100">ข้อความรายละเอียด...</p>
             <div id="modalActionArea" class="pt-2">
-                <button onclick="closeModal()" class="bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold px-6 py-2 rounded-xl transition">ตกลง</button>
+                <button onclick="closeModal()" class="bg-amber-500 hover:bg-amber-400 text-emerald-950 font-semibold px-6 py-2 rounded-xl transition hover-btn-glow">ตกลง</button>
             </div>
         </div>
     </div>
 
     <!-- โครงสร้างใบเสร็จสำหรับดาวน์โหลดสลิป -->
-    <div id="receiptSlip" class="hidden absolute top-0 left-0 p-8 bg-emerald-900 text-white rounded-2xl w-[420px] space-y-4 border border-emerald-700 shadow-2xl z-50">
+    <div id="receiptSlip" class="opacity-0 pointer-events-none absolute -top-[9999px] left-0 p-8 bg-emerald-900 text-white rounded-2xl w-[420px] space-y-4 border border-emerald-700 shadow-2xl z-50">
         <div class="text-center border-b border-emerald-700 pb-3">
             <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-800 border border-amber-400 flex items-center justify-center text-amber-300 font-bold">🌿</div>
             <h2 class="text-base font-bold text-amber-300">ร้านอาหารระเบียงยิ้ม</h2>
             <p class="text-xs text-emerald-300">สลิปยืนยันรายการอาหารและหักเงินกองกลาง</p>
         </div>
-        <div id="slipItemsList" class="text-xs space-y-2 divide-y divide-emerald-800/60">
-            <!-- รายการอาหารจะถูกดึงมาแสดงตรงนี้อัตโนมัติ -->
-        </div>
+        <div id="slipItemsList" class="text-xs space-y-2 divide-y divide-emerald-800/60"></div>
         <div class="border-t border-emerald-700 pt-3 space-y-1 text-xs">
             <div class="flex justify-between font-bold text-amber-300">
                 <span>ยอดรวมทั้งสิ้น:</span>
@@ -478,7 +526,7 @@
             if(!container) return;
             container.innerHTML = categories.map(cat => `
                 <button onclick="selectCategory('${cat.id}')" 
-                    class="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm border ${activeCategory === cat.id ? 'bg-amber-500 text-emerald-950 font-bold border-amber-400 shadow-md' : 'bg-emerald-900/80 text-emerald-200 border-emerald-700 hover:bg-emerald-800'}">
+                    class="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm border hover-neon-effect ${activeCategory === cat.id ? 'bg-amber-500 text-emerald-950 font-bold border-amber-400 shadow-md' : 'bg-emerald-900/80 text-emerald-200 border-emerald-700 hover:bg-emerald-800'}">
                     ${cat.name}
                 </button>
             `).join('');
@@ -512,7 +560,7 @@
             grid.innerHTML = filtered.map(item => {
                 let optionsHtml = item.options.map((opt, idx) => `<option value="${idx}">${opt.label} — ${opt.price} บาท</option>`).join('');
                 return `
-                <div class="bg-emerald-900/80 border border-emerald-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg">
+                <div class="bg-emerald-900/80 border border-emerald-700/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover-neon-effect">
                     <div>
                         <div class="relative rounded-xl overflow-hidden bg-emerald-950 border border-emerald-800 mb-3 flex items-center justify-center">
                             <img src="${item.image}" alt="${item.name}" class="w-full h-auto object-contain">
@@ -527,7 +575,7 @@
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-3 border-t border-emerald-800/80">
                         <span class="text-xs text-emerald-400">หมวด: ${window.getCategoryName(item.category)}</span>
-                        <button onclick="addSelectedToCart(${item.id})" class="bg-emerald-700 hover:bg-amber-500 hover:text-emerald-950 text-white px-4 py-2 rounded-xl text-xs font-semibold transition"><span>+ เพิ่มลงตะกร้า</span></button>
+                        <button onclick="addSelectedToCart(${item.id})" class="bg-emerald-700 hover:bg-amber-500 hover:text-emerald-950 text-white px-4 py-2 rounded-xl text-xs font-semibold transition hover-btn-glow"><span>+ เพิ่มลงตะกร้า</span></button>
                     </div>
                 </div>`;
             }).join('');
@@ -553,7 +601,8 @@
 
             if (existing) { existing.qty += 1; } 
             else {
-                window.cart.push({ key: cartUniqueKey, name: `${item.name} (${selectedOpt.label})`, price: selectedOpt.price, image: item.image, qty: 1 });
+                // เติมดาว ⭐ นำหน้าชื่อเมนูในตะกร้าให้อัตโนมัติ
+                window.cart.push({ key: cartUniqueKey, name: `⭐ ${item.name} (${selectedOpt.label})`, price: selectedOpt.price, image: item.image, qty: 1 });
             }
             window.saveCartToFirebase(window.cart);
         }
@@ -628,16 +677,15 @@
             if(totalPriceDisplay) totalPriceDisplay.innerText = `${totalPrice.toLocaleString()} บาท`;
             if(remainingSavingsDisplay) remainingSavingsDisplay.innerText = `${remaining.toLocaleString()} บาท`;
 
-            // จัดการ UI ตามสถานะการยืนยันออเดอร์
             if (window.isOrderConfirmed) {
                 orderStatusBanner.classList.remove('hidden');
                 clearCartBtn.classList.add('hidden');
                 actionButtonArea.innerHTML = `
                     <div class="space-y-2">
-                        <button onclick="downloadSlip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs">
+                        <button onclick="downloadSlip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs hover-btn-glow">
                             <span>📥 ดาวน์โหลดสลิปรายการอาหาร</span>
                         </button>
-                        <button onclick="unlockOrder()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                        <button onclick="unlockOrder()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs hover-btn-glow">
                             <span>🔓 ปลดล็อก / แก้ไขออเดอร์ (คืนเงิน)</span>
                         </button>
                     </div>
@@ -646,7 +694,7 @@
                 orderStatusBanner.classList.add('hidden');
                 clearCartBtn.classList.remove('hidden');
                 actionButtonArea.innerHTML = `
-                    <button onclick="checkoutOrder()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                    <button onclick="checkoutOrder()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 hover-btn-glow">
                         <span>✨ ยืนยันสั่งอาหารและตัดเงินกองกลาง</span>
                     </button>
                 `;
@@ -658,7 +706,7 @@
             }
 
             cartList.innerHTML = window.cart.map(item => `
-                <div class="bg-emerald-950/60 border border-emerald-800 rounded-xl p-3 flex items-center justify-between gap-2">
+                <div class="bg-emerald-950/60 border border-emerald-800 rounded-xl p-3 flex items-center justify-between gap-2 hover-neon-effect">
                     <div class="flex items-center gap-2.5 overflow-hidden">
                         <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-lg object-cover border border-emerald-700 flex-shrink-0">
                         <div class="overflow-hidden">
@@ -667,10 +715,10 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs" ${window.isOrderConfirmed ? 'disabled' : ''}>-</button>
+                        <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold text-xs hover-btn-glow" ${window.isOrderConfirmed ? 'disabled' : ''}>-</button>
                         <span class="text-xs font-bold w-5 text-center">${item.qty}</span>
-                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 rounded-lg text-white font-bold text-xs" ${window.isOrderConfirmed ? 'disabled' : ''}>+</button>
-                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 text-red-300 rounded-lg text-xs border border-red-800" ${window.isOrderConfirmed ? 'disabled' : ''}>🗑️</button>
+                        <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-emerald-800 hover:bg-emerald-700 rounded-lg text-white font-bold text-xs hover-btn-glow" ${window.isOrderConfirmed ? 'disabled' : ''}>+</button>
+                        <button onclick="removeItem('${item.key}')" class="w-6 h-6 bg-red-950/60 text-red-300 rounded-lg text-xs border border-red-800 hover:bg-red-900 hover-btn-glow" ${window.isOrderConfirmed ? 'disabled' : ''}>🗑️</button>
                     </div>
                 </div>`).join('');
         }
@@ -764,7 +812,7 @@
             renderMenuGrid();
         };
 
-        // ฟังก์ชันดาวน์โหลดสลิปรายการอาหาร (ปรับแก้ให้ชื่อเมนูปัดบรรทัดแสดงผลครบถ้วนไม่โดนตัด)
+        // ฟังก์ชันดาวน์โหลดสลิป
         window.downloadSlip = function() {
             const slipListEl = document.getElementById('slipItemsList');
             const slipTotalEl = document.getElementById('slipTotalPrice');
@@ -791,48 +839,53 @@
                 return;
             }
 
-            // แสดงชั่วคราวแบบโปร่งใสเพื่อให้ html2canvas เรนเดอร์ความสูงได้ครบถ้วน
-            slipElement.classList.remove('hidden');
-            slipElement.classList.add('opacity-0');
-            
-            html2canvas(slipElement, { 
-                scale: 2, 
-                backgroundColor: '#064e3b', 
-                useCORS: true,
-                scrollY: -window.scrollY
-            }).then(canvas => {
-                slipElement.classList.add('hidden');
-                slipElement.classList.remove('opacity-0');
+            slipElement.classList.remove('opacity-0', 'pointer-events-none');
+            slipElement.style.position = 'fixed';
+            slipElement.style.top = '0';
+            slipElement.style.left = '0';
+            slipElement.style.zIndex = '9999';
 
-                const imageURL = canvas.toDataURL('image/png');
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            setTimeout(() => {
+                html2canvas(slipElement, { 
+                    scale: 2, 
+                    backgroundColor: '#064e3b', 
+                    useCORS: true,
+                    windowWidth: document.documentElement.offsetWidth
+                }).then(canvas => {
+                    slipElement.classList.add('opacity-0', 'pointer-events-none');
+                    slipElement.style.position = 'absolute';
+                    slipElement.style.top = '-9999px';
 
-                if (isMobile) {
-                    const newWindow = window.open();
-                    if (newWindow) {
-                        newWindow.document.write(`
-                            <html>
-                                <head><title>สลิปรายการอาหาร - ระเบียงยิ้ม</title></head>
-                                <body style="background:#064e3b; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; color:#fff; font-family:sans-serif;">
-                                    <p style="margin-bottom:15px; font-size:14px; color:#fde047;">📱 กดค้างที่รูปภาพด้านล่าง แล้วเลือก "บันทึกรูปภาพ"</p>
-                                    <img src="${imageURL}" style="max-width:90%; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" />
-                                </body>
-                            </html>
-                        `);
+                    const imageURL = canvas.toDataURL('image/png');
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                    if (isMobile) {
+                        const newWindow = window.open();
+                        if (newWindow) {
+                            newWindow.document.write(`
+                                <html>
+                                    <head><title>สลิปรายการอาหาร - ระเบียงยิ้ม</title></head>
+                                    <body style="background:#064e3b; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; color:#fff; font-family:sans-serif;">
+                                        <p style="margin-bottom:15px; font-size:14px; color:#fde047;">📱 กดค้างที่รูปภาพด้านล่าง แล้วเลือก "บันทึกรูปภาพ"</p>
+                                        <img src="${imageURL}" style="max-width:90%; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);" />
+                                    </body>
+                                </html>
+                            `);
+                        } else {
+                            triggerDownload(imageURL);
+                        }
                     } else {
                         triggerDownload(imageURL);
                     }
-                } else {
-                    triggerDownload(imageURL);
-                }
-            }).catch(err => {
-                console.error("Error generating slip:", err);
-                slipElement.classList.add('hidden');
-                slipElement.classList.remove('opacity-0');
-            });
+                }).catch(err => {
+                    console.error("Error generating slip:", err);
+                    slipElement.classList.add('opacity-0', 'pointer-events-none');
+                    slipElement.style.position = 'absolute';
+                    slipElement.style.top = '-9999px';
+                });
+            }, 300);
         }
 
-        // ฟังก์ชันช่วยดาวน์โหลดสำหรับคอมพิวเตอร์
         function triggerDownload(url) {
             const link = document.createElement('a');
             link.download = `Slip-RabiangYim-${Date.now()}.png`;
